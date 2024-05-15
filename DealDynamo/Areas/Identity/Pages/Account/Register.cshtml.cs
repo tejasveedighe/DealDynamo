@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 using System.Text.Encodings.Web;
@@ -91,6 +92,15 @@ namespace DealDynamo.Areas.Identity.Pages.Account
             [Display(Name = "Confirm password")]
             [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
             public string ConfirmPassword { get; set; }
+
+
+            /// <summary>
+            ///     To get the IsSeller or IsBuyer boolearn Value
+            /// </summary>
+            [Required]
+            public bool IsSeller { get; set; } 
+            [Required]
+            public bool IsBuyer { get; set; }
         }
 
 
@@ -108,12 +118,24 @@ namespace DealDynamo.Areas.Identity.Pages.Account
             {
                 var user = CreateUser();
 
+                if(!Input.IsBuyer && !Input.IsBuyer)
+                {
+                    ModelState.AddModelError(string.Empty, "User Type Must be selected");
+                    return Page();
+                }
+
+                user.IsSeller = Input.IsSeller;
+                user.IsBuyer = Input.IsBuyer;
+
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
                 var result = await _userManager.CreateAsync(user, Input.Password);
 
                 if (result.Succeeded)
                 {
+
+                    await _userManager.AddToRoleAsync(user, Input.IsBuyer ? "Buyer" : Input.IsSeller ? "Seller" : "Buyer");
+
                     _logger.LogInformation("User created a new account with password.");
 
                     var userId = await _userManager.GetUserIdAsync(user);

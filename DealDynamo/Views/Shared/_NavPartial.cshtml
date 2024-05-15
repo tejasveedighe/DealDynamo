@@ -38,6 +38,8 @@
                     Products
                 </a>
             </li>
+                @if(IsAdmin)
+                {
              <li>
                 <a asp-controller="Categories" asp-action="Index" class="nav-link text-white">
                     <svg class="bi me-2" width="16" height="16"><use xlink:href="#grid"></use></svg>
@@ -45,8 +47,6 @@
                 </a>
             </li>
 
-                @if(IsAdmin)
-                {
                     <li>
                         <a asp-controller="Customers" asp-action="Index" class="nav-link text-white">
                             <svg class="bi me-2" width="16" height="16"><use xlink:href="#people-circle"></use></svg>
