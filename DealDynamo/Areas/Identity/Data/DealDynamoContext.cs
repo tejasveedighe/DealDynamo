@@ -21,4 +21,5 @@ public class DealDynamoContext : IdentityDbContext<ApplicationUser>
     }
 
     public DbSet<DealDynamo.Models.Category>? Category { get; set; }
+    public DbSet<DealDynamo.Models.Product>? Product { get; set; }
 }

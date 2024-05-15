@@ -21,6 +21,7 @@ builder.Services.AddRazorPages();
 
 // Adding Repository Services
 builder.Services.AddTransient<ICategoryRepository, CategoryRepository>();
+builder.Services.AddTransient<IProductRepository, ProductRepository>();
 
 var app = builder.Build();
 
