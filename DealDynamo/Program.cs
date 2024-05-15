@@ -15,6 +15,9 @@ builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.R
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+builder.Services.AddMvc();
+builder.Services.AddRazorPages();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -73,5 +76,7 @@ using (var scope = app.Services.CreateScope())
         await userManager.AddToRoleAsync(user, "Admin");
     }
 }
+
+app.MapRazorPages();
 
 app.Run();
