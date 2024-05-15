@@ -1,7 +1,7 @@
 ﻿using DealDynamo.Areas.Identity.Data;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using DealDynamo.Models;
 
 namespace DealDynamo.Data;
 
@@ -19,4 +19,6 @@ public class DealDynamoContext : IdentityDbContext<ApplicationUser>
         // For example, you can rename the ASP.NET Identity table names and more.
         // Add your customizations after calling base.OnModelCreating(builder);
     }
+
+    public DbSet<DealDynamo.Models.Category>? Category { get; set; }
 }

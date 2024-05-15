@@ -1,7 +1,8 @@
+using DealDynamo.Areas.Identity.Data;
+using DealDynamo.Data;
+using DealDynamo.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using DealDynamo.Data;
-using DealDynamo.Areas.Identity.Data;
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DealDynamoContextConnection") ?? throw new InvalidOperationException("Connection string 'DealDynamoContextConnection' not found.");
 
@@ -17,6 +18,9 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddMvc();
 builder.Services.AddRazorPages();
+
+// Adding Repository Services
+builder.Services.AddTransient<ICategoryRepository, CategoryRepository>();
 
 var app = builder.Build();
 

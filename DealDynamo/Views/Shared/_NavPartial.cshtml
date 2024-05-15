@@ -1,0 +1,81 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using DealDynamo.Areas.Identity.Data
+
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+@{
+    bool IsAdmin = User.IsInRole("Admin");
+    bool IsSeller = User.IsInRole("Seller");
+}
+
+@if(IsAdmin || IsSeller)
+{
+    <aside class="col-auto d-flex flex-column flex-shrink-0 p-3 text-white bg-dark sidebar" style="width: 280px; height: 98vh">
+        <a asp-area="" asp-controller="Home" asp-action="Index" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+            <svg class="bi me-2" width="40" height="32"><use xlink:href="#bootstrap"></use></svg>
+            <span class="fs-4">
+                   Deal Dynamo
+            </span>
+        </a>
+        <hr>
+        <ul class="nav nav-pills flex-column mb-auto">
+            <li>
+                <a asp-controller="Home" asp-action="Index" class="nav-link text-white">
+                    <svg class="bi me-2" width="16" height="16"><use xlink:href="#speedometer2"></use></svg>
+                    Dashboard
+                </a>
+            </li>
+            <li>
+                <a asp-controller="Orders" asp-action="Index" class="nav-link text-white">
+                    <svg class="bi me-2" width="16" height="16"><use xlink:href="#table"></use></svg>
+                    Orders
+                </a>
+            </li>
+            <li>
+                <a asp-controller="Products" asp-action="Index" class="nav-link text-white">
+                    <svg class="bi me-2" width="16" height="16"><use xlink:href="#grid"></use></svg>
+                    Products
+                </a>
+            </li>
+             <li>
+                <a asp-controller="Categories" asp-action="Index" class="nav-link text-white">
+                    <svg class="bi me-2" width="16" height="16"><use xlink:href="#grid"></use></svg>
+                    Categories
+                </a>
+            </li>
+
+                @if(IsAdmin)
+                {
+                    <li>
+                        <a asp-controller="Customers" asp-action="Index" class="nav-link text-white">
+                            <svg class="bi me-2" width="16" height="16"><use xlink:href="#people-circle"></use></svg>
+                            Customers
+                        </a>
+                    </li>
+                 }
+             <li>
+                <a asp-controller="Payments" asp-action="Index" class="nav-link text-white">
+                    <svg class="bi me-2" width="16" height="16"><use xlink:href="#grid"></use></svg>
+                    Payments
+                </a>
+            </li>
+            </ul>
+        <hr>
+               <div class="dropdown">
+                <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+                    <img src="https://github.com/mdo.png" alt="" width="32" height="32" class="rounded-circle me-2">
+                    <strong>@UserManager.GetUserName(User)</strong>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1" style="">
+                    <li><a class="dropdown-item" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Profile</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li class="nav-item">
+                        <form id="logoutForm" class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                            <button id="logout" type="submit" class="nav-link btn btn-link text-white">Logout</button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+    </aside>
+}
