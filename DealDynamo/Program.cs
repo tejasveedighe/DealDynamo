@@ -53,27 +53,25 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-// Adding Admin user
+// adding a admin role to the database 
 using (var scope = app.Services.CreateScope())
 {
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
 
     string email = "admin@dealdynamo.com";
-    string password = "admin";
+    string password = "Download@1";
 
+    // check if the email is already added
     if (await userManager.FindByEmailAsync(email) == null)
     {
-        var adminUser = new ApplicationUser()
-        {
-            Email = email,
-            UserName = email,
-            IsAdmin = true,
-        };
+        var user = new ApplicationUser();
+        user.Email = email;
+        user.UserName = email;
+        user.EmailConfirmed = true;
 
-        await userManager.CreateAsync(adminUser, password);
-        await userManager.AddToRoleAsync(adminUser, "Admin");
+        await userManager.CreateAsync(user, password);
+        await userManager.AddToRoleAsync(user, "Admin");
     }
-
 }
 
 app.Run();
