@@ -98,7 +98,7 @@ namespace DealDynamo.Areas.Identity.Pages.Account
             ///     To get the IsSeller or IsBuyer boolearn Value
             /// </summary>
             [Required]
-            public bool IsSeller { get; set; } 
+            public bool IsSeller { get; set; }
             [Required]
             public bool IsBuyer { get; set; }
         }
@@ -118,7 +118,7 @@ namespace DealDynamo.Areas.Identity.Pages.Account
             {
                 var user = CreateUser();
 
-                if(!Input.IsBuyer && !Input.IsSeller)
+                if (!Input.IsBuyer && !Input.IsSeller)
                 {
                     ModelState.AddModelError(string.Empty, "User Type Must be selected");
                     return Page();

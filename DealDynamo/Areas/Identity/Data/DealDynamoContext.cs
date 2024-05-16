@@ -1,8 +1,8 @@
-﻿using DealDynamo.Areas.Identity.Data;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using DealDynamo.Models;
 using DealDynamo.Models.ProductViewModels;
+using DealDynamo.Areas.Identity.Data;
+using DealDynamo.Models.UserViewModels;
 
 namespace DealDynamo.Data;
 
@@ -23,5 +23,6 @@ public class DealDynamoContext : IdentityDbContext<ApplicationUser>
 
     public DbSet<DealDynamo.Models.Category>? Category { get; set; }
     public DbSet<DealDynamo.Models.Product>? Product { get; set; }
-    public DbSet<DealDynamo.Models.ProductViewModels.ViewDetailProductViewModel>? ViewDetailProductViewModel { get; set; }
+    public DbSet<DealDynamo.Models.UserViewModels.UserViewModel>? UserViewModel { get; set; }
+    public DbSet<DealDynamo.Models.UserViewModels.UserEditViewModel>? UserEditViewModel { get; set; }
 }

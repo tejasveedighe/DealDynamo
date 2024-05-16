@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Details";
+    bool IsSeller = User.IsInRole("Seller");
 }
 
 <h1>Details</h1>
@@ -49,6 +50,10 @@
     </dl>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model?.ProductId">Edit</a> |
+    
+    @if(IsSeller)
+    {
+        <a asp-action="Edit" asp-route-id="@Model?.ProductId">Edit</a> <text> | </text>
+    }
     <a asp-action="Index">Back to List</a>
 </div>

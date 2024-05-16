@@ -68,10 +68,10 @@
                 <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
                     @if(IsSeller)
                     {
-                        @Html.ActionLink("Edit", "Edit", "Products", new {id = item.Id});
+                        @Html.ActionLink("Edit", "Edit", "Products", new {id = item.Id})
                         <text> | </text>
-                        @Html.ActionLink("Delete", "Delete", "Products", new {id=item.Id});
                     }
+                        @Html.ActionLink("Delete", "Delete", "Products", new {id=item.Id})
             </td>
         </tr>
 }
