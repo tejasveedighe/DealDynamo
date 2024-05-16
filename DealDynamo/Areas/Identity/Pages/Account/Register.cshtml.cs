@@ -118,7 +118,7 @@ namespace DealDynamo.Areas.Identity.Pages.Account
             {
                 var user = CreateUser();
 
-                if(!Input.IsBuyer && !Input.IsBuyer)
+                if(!Input.IsBuyer && !Input.IsSeller)
                 {
                     ModelState.AddModelError(string.Empty, "User Type Must be selected");
                     return Page();

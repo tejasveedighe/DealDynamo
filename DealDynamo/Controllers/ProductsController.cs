@@ -34,7 +34,7 @@ namespace DealDynamo.Controllers
         {
             IEnumerable<Product> products = _productRepository.GetAllCategories();
 
-            if (!await UserManager.IsInRoleAsync(await UserManager.GetUserAsync(User), "Seller"))
+            if (await UserManager.IsInRoleAsync(await UserManager.GetUserAsync(User), "Seller"))
             {
                 string currentUserId = UserManager.GetUserId(User);
                 Guid currentSellerId = Guid.Parse(currentUserId); // Parse string to Guid
