@@ -52,7 +52,7 @@ namespace DealDynamo.Data
         {
             CreateProductViewModel vm = new CreateProductViewModel()
             {
-                Category = new SelectList(_categoryRepository.GetAllCategories(), "Id", "Title")
+                Categories = _categoryRepository.GetAllCategories(),
             };
             return View(vm);
         }
@@ -65,6 +65,7 @@ namespace DealDynamo.Data
         {
             try
             {
+
                 return RedirectToAction(nameof(Index));
             }
             catch

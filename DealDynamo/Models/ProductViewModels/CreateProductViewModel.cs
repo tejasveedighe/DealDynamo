@@ -8,7 +8,7 @@ namespace DealDynamo.Models.ProductViewModels
         public int Quantity { get; set; }
         public string? Description { get; set; }
         public IFormFile ProductImage { get; set; }
-        public SelectList Category { get; set; }
+        public IEnumerable<Category> Categories { get; set; }
         public int Price { get; set; }
 
     }
