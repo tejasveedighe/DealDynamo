@@ -1,16 +1,16 @@
-﻿@model DealDynamo.Models.ProductViewModels.CreateProductViewModel
+﻿@model DealDynamo.Models.ProductViewModels.EditProductViewModel
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Edit";
 }
 
-<h1>Create</h1>
+<h1>Edit</h1>
 
 <h4>Product</h4>
 <hr />
 <div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create" enctype="multipart/form-data">
+    <div class="row">
+        <form class="col-md-5" asp-action="Edit" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="Title" class="control-label"></label>
@@ -28,13 +28,13 @@
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="ProductImage" class="control-label"></label>
-                <input type="file" asp-for="ProductImage" accept="image/jpg, image/png" name="ProductImage" class="form-control" />
-                <span asp-validation-for="ProductImage" class="text-danger"></span>
+                <label asp-for="NewProductImage" class="control-label"></label>
+                <input id="customFileUploadInput" type="file" asp-for="NewProductImage" accept="image/jpg, image/png" name="NewProductImage" class="form-control" />
+                <span asp-validation-for="NewProductImage" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Categories" class="control-label"></label>
-                <select id="drpEmpList" class="form-control" asp-for="CategoryId" asp-items="@(new SelectList(Model.Categories, "Id", "Title"))">
+                <select class="form-control" asp-for="CategoryId" asp-items="@(new SelectList(Model.Categories, "Id", "Title"))">
                     <option value="">--Select--</option>
                 </select>
                 <span asp-validation-for="CategoryId" class="text-danger"></span>
@@ -45,10 +45,12 @@
                 <input asp-for="Price" class="form-control" />
                 <span asp-validation-for="Price" class="text-danger"></span>
             </div>
+            <input asp-for="ProductId" class="visually-hidden"/>
             <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+                <input type="submit" value="Update" class="btn btn-primary" />
             </div>
         </form>
+        <img id="productImage" class="col-auto" src="~/images/@Model.ProductImage" height="300" width="300"/>
     </div>
 </div>
 
@@ -56,8 +58,28 @@
     <a asp-action="Index">Back to List</a>
 </div>
 
+
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+    <script type="text/javascript">
+        function updateProductImage() {
+            var fileInput = document.getElementById("customFileUploadInput");
+            var imgElement = document.getElementById("productImage");
+            if (fileInput.files && fileInput.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    imgElement.src = e.target.result;
+                }
+                reader.readAsDataURL(fileInput.files[0]);
+            }
+        }
+
+        updateProductImage();
+
+        $("#customFileUploadInput").change(function () {
+            updateProductImage();
+        });
+    </script>
 }

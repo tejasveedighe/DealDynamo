@@ -20,7 +20,6 @@ namespace DealDynamo.Data
         public void AddProduct(Product product)
         {
             _db.Product.Add(product);
-            SaveChanges();
         }
 
         public void DeleteProduct(int? id)
@@ -28,7 +27,6 @@ namespace DealDynamo.Data
             if (ProductExists(id))
             {
                 _db.Product.Remove(GetProductById(id));
-                SaveChanges();
             }
         }
 
@@ -50,7 +48,6 @@ namespace DealDynamo.Data
         public void UpdateProduct(Product category)
         {
             _db.Product.Update(category);
-            SaveChanges();
         }
     }
 }

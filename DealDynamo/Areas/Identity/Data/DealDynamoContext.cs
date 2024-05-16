@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using DealDynamo.Models;
+using DealDynamo.Models.ProductViewModels;
 
 namespace DealDynamo.Data;
 
@@ -22,4 +23,5 @@ public class DealDynamoContext : IdentityDbContext<ApplicationUser>
 
     public DbSet<DealDynamo.Models.Category>? Category { get; set; }
     public DbSet<DealDynamo.Models.Product>? Product { get; set; }
+    public DbSet<DealDynamo.Models.ProductViewModels.ViewDetailProductViewModel>? ViewDetailProductViewModel { get; set; }
 }

@@ -1,10 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace DealDynamo.Models.ProductViewModels
 {
-    public class CreateProductViewModel
+    public class EditProductViewModel
     {
+        public int ProductId { get; set; }
         public string Title { get; set; }
 
         [Range(minimum: 1, maximum: 100000)]
@@ -12,12 +12,15 @@ namespace DealDynamo.Models.ProductViewModels
         public string? Description { get; set; }
 
         [Display(Name = "Product Image")]
+        public string ProductImage { get; set; }
+
         [DataType(DataType.Upload)]
-        public IFormFile ProductImage { get; set; }
+        [Display(Name = "Update Product Image")]
+        public IFormFile NewProductImage { get; set; }
         public IEnumerable<Category> Categories { get; set; }
 
         [Required(ErrorMessage = "Category Must be Selected")]
-        public int CategoryId { get; set; }
+        public int? CategoryId { get; set; }
 
         [DataType(DataType.Currency)]
         public int Price { get; set; }
