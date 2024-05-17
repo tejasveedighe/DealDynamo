@@ -32,7 +32,7 @@ namespace DealDynamo.Controllers
         [HttpGet]
         public async Task<ActionResult> Index()
         {
-            IEnumerable<Product> products = _productRepository.GetAllCategories();
+            IEnumerable<Product> products = _productRepository.GetAllProducts();
 
             if (await UserManager.IsInRoleAsync(await UserManager.GetUserAsync(User), "Seller"))
             {

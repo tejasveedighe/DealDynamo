@@ -1,4 +1,11 @@
-﻿@model IEnumerable<DealDynamo.Models.Product>
+﻿@using DealDynamo.Areas.Identity.Data
+@using DealDynamo.Services
+@using Microsoft.AspNetCore.Identity
+
+@model IEnumerable<DealDynamo.Models.Product>
+
+@inject UserManager<ApplicationUser> UserManager;
+@inject ICategoryRepository _categoryRepository;
 
 @{
     ViewData["Title"] = "Index";
@@ -33,6 +40,7 @@
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.SellerID)
+
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Price)
@@ -56,10 +64,10 @@
                 @Html.DisplayFor(modelItem => item.ProductImage)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.CategoryID)
+                @_categoryRepository.GetCategoryById(item.CategoryID).Title
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.SellerID)
+                @UserManager.FindByIdAsync(Convert.ToString(item.SellerID)).GetAwaiter().GetResult().UserName
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Price)

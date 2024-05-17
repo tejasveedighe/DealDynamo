@@ -5,7 +5,13 @@
 @inject UserManager<ApplicationUser> UserManager
 
 <ul class="navbar-nav">
-@if (SignInManager.IsSignedIn(User))
+    @if(!User.IsInRole("Admin") || !User.IsInRole("Seller"))
+    {
+    <li class="nav-item">
+        <a id="cart" class="nav-link text-dark" asp-action="ViewCart" asp-controller="Cart">Cart</a>
+    </li>
+    }
+    @if (SignInManager.IsSignedIn(User))
 {
     <li class="nav-item">
         <a id="manage" class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @UserManager.GetUserName(User)!</a>

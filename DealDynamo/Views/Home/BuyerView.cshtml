@@ -1,0 +1,100 @@
+﻿@model DealDynamo.Models.ProductViewModels.ProductCardListViewModel
+
+@{
+    ViewData["Title"] = "Products";
+    var categories = ViewBag.Categories as List<DealDynamo.Models.Category>;
+}
+
+<h1>Products</h1>
+
+<div class="search-filter-sort d-flex gap-2">
+    <input type="text" id="searchBox" placeholder="Search products..." class="form-control mb-2" />
+    <select id="categoryFilter" class="form-control mb-2">
+        <option value="">All Categories</option>
+        @foreach (var category in categories)
+        {
+            <option value="@category.Id">@category.Title</option>
+        }
+    </select>
+    <select id="sortOptions" class="form-control mb-2">
+        <option value="name">Sort by Name</option>
+        <option value="price">Sort by Price</option>
+    </select>
+</div>
+
+<div id="productsList" class="row">
+    @foreach (var item in Model.Products)
+    {
+        <div data-product-id="@item.Id" data-category-id="@item.CategoryID" class="product-item col-md-2 col align-self-start" >
+            <div class="card mb-4 shadow-sm">
+                <img class="card-img-top" src="~/images/@item.ProductImage" alt="@item.Title" />
+                <div class="card-body">
+                    <h3 class="card-title">@item.Title</h3>
+                    <p class="card-text">Price: @item.Price</p>
+                    <span class="badge text-white bg-primary">
+                        @categories.FirstOrDefault(x => x.Id == item.CategoryID)?.Title
+                    </span>
+                    <hr>
+                    <a asp-controller="Home" asp-action="Details" asp-route-id="@item.Id">View Details</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<nav aria-label="Page navigation" class="mt-5">
+    <ul class="pagination">
+        @for (int i = 1; i <= Model.TotalPages; i++)
+        {
+            <li class="page-item @(Model.CurrentPage == i ? "active" : "")">
+                <a class="page-link" asp-action="Index" asp-route-currentPage="@i" asp-route-pageSize="@Model.PageSize">@i</a>
+            </li>
+        }
+    </ul>
+</nav>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#searchBox').on('input', function () {
+                var searchText = $(this).val().toLowerCase();
+                $('.product-item').each(function () {
+                    var title = $(this).find('.card-title').text().toLowerCase();
+                    $(this).toggle(title.includes(searchText));
+                });
+            });
+
+            $('#categoryFilter').on('change', function () {
+                var selectedCategory = $(this).val();
+                if (selectedCategory === "") {
+                    $('.product-item').show();
+                } else {
+                    $('.product-item').each(function () {
+                        var categoryId = $(this).data('category-id');
+                        $(this).toggle(categoryId == selectedCategory);
+                    });
+                }
+            });
+
+            $('#sortOptions').on('change', function () {
+                var sortOption = $(this).val();
+                var products = $('.product-item').toArray();
+
+                products.sort(function (a, b) {
+                    if (sortOption === 'name') {
+                        var nameA = $(a).find('.card-title').text().toLowerCase();
+                        var nameB = $(b).find('.card-title').text().toLowerCase();
+                        return nameA < nameB ? -1 : nameA > nameB ? 1 : 0;
+                    } else if (sortOption === 'price') {
+                        var priceA = parseFloat($(a).find('.card-text:contains("Price: ")').text().replace('Price: ', ''));
+                        var priceB = parseFloat($(b).find('.card-text:contains("Price: ")').text().replace('Price: ', ''));
+                        return priceA - priceB;
+                    }
+                    return 0;
+                });
+
+                $('#productsList').html(products);
+            });
+        });
+    </script>
+}

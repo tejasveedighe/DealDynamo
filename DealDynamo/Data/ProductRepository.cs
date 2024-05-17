@@ -30,7 +30,7 @@ namespace DealDynamo.Data
             }
         }
 
-        public IEnumerable<Product> GetAllCategories()
+        public IEnumerable<Product> GetAllProducts()
         {
             return _db.Product.ToList();
         }
