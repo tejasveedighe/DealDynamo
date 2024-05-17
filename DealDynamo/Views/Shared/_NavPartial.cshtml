@@ -21,19 +21,19 @@
         <hr>
         <ul class="nav nav-pills flex-column mb-auto">
             <li>
-                <a asp-controller="Home" asp-action="Index" class="nav-link text-white">
+                <a asp-area="" asp-controller="Home" asp-action="Index" class="nav-link text-white">
                     <i class="fa-solid fa-gauge"></i>
                     Dashboard
                 </a>
             </li>
             <li>
-                <a asp-controller="Orders" asp-action="Index" class="nav-link text-white">
+                <a asp-area="" asp-controller="Orders" asp-action="Index" class="nav-link text-white">
                     <i class="fa-solid fa-cart-shopping"></i>
                     Orders
                 </a>
             </li>
             <li>
-                <a asp-controller="Products" asp-action="Index" class="nav-link text-white">
+                <a asp-area="" asp-controller="Products" asp-action="Index" class="nav-link text-white">
                     <i class="fa-solid fa-shop"></i>
                     Products
                 </a>
@@ -41,21 +41,21 @@
                 @if(IsAdmin)
                 {
              <li>
-                <a asp-controller="Categories" asp-action="Index" class="nav-link text-white">
+                <a asp-area="" asp-controller="Categories" asp-action="Index" class="nav-link text-white">
                         <i class="fa-solid fa-list"></i>
                     Categories
                 </a>
             </li>
 
                     <li>
-                        <a asp-controller="Users" asp-action="Index" class="nav-link text-white">
+                        <a asp-area="" asp-controller="Users" asp-action="Index" class="nav-link text-white">
                         <i class="fa-solid fa-user"></i>
                             Users
                         </a>
                     </li>
                  }
              <li>
-                <a asp-controller="Payments" asp-action="Index" class="nav-link text-white">
+                <a asp-area="" asp-controller="Payments" asp-action="Index" class="nav-link text-white">
                     <i class="fa-solid fa-file-invoice"></i>
                     Payments
                 </a>

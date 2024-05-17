@@ -102,7 +102,22 @@ namespace DealDynamo.Controllers
         // GET: UsersController/Delete/5
         public ActionResult Delete(string id)
         {
-            return View();
+            var user = UserManager.Users.FirstOrDefault(x => x.Id == id);
+            if (user == null)
+            {
+                return NotFound("User Not Found");
+            }
+            UserDeleteViewModel vm = new UserDeleteViewModel()
+            {
+                Id = id,
+                UserName = user.UserName,
+                Email = user.Email,
+                IsAdmin = user.IsAdmin,
+                IsSeller = user.IsSeller,
+                IsBuyer = user.IsBuyer
+            };
+
+            return View(vm);
         }
 
         // POST: UsersController/Delete/5
