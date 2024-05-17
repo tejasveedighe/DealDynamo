@@ -23,6 +23,10 @@ builder.Services.AddRazorPages();
 builder.Services.AddTransient<ICategoryRepository, CategoryRepository>();
 builder.Services.AddTransient<IProductRepository, ProductRepository>();
 
+// Enabling Session
+builder.Services.AddSession();
+builder.Services.AddDistributedMemoryCache();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -88,5 +92,7 @@ using (var scope = app.Services.CreateScope())
 }
 
 app.MapRazorPages();
+
+app.UseSession();
 
 app.Run();

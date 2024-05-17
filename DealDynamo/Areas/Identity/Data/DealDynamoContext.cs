@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using DealDynamo.Models.ProductViewModels;
 using DealDynamo.Areas.Identity.Data;
 using DealDynamo.Models.UserViewModels;
+using DealDynamo.Models;
 
 namespace DealDynamo.Data;
 
@@ -25,4 +26,5 @@ public class DealDynamoContext : IdentityDbContext<ApplicationUser>
     public DbSet<DealDynamo.Models.Product>? Product { get; set; }
     public DbSet<DealDynamo.Models.UserViewModels.UserViewModel>? UserViewModel { get; set; }
     public DbSet<DealDynamo.Models.UserViewModels.UserEditViewModel>? UserEditViewModel { get; set; }
+    public DbSet<DealDynamo.Models.CartItem>? CartItem { get; set; }
 }

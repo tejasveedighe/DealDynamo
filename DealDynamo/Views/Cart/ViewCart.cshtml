@@ -1,1 +1,57 @@
-﻿<h2>This is my cart</h2>
+﻿@model DealDynamo.Models.CartViewModels.CartViewModel
+@{
+    ViewData["Title"] = "Shopping Cart";
+}
+
+<div class="container">
+    <h2>Your Cart</h2>
+
+    @if (Model.CartItems != null && Model.CartItems.Any())
+    {
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Product Name</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th>Subtotal</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.CartItems)
+                {
+                    <tr>
+                        <td>@item.Product.Title</td>
+                        <td>@item.Quantity</td>
+                        <td>&#8377;@item.Product.Price</td>
+                        <td>&#8377;@(item.Product.Price * item.Quantity)</td>
+                        <td>
+                            <a asp-action="Remove" asp-route-id="@item.Product.Id" class="text-danger">Remove</a>
+                            <a asp-action="AddToCart" asp-route-id="@item.Product.Id">+ Add</a>
+                            <a asp-action="Decrease" asp-route-id="@item.Product.Id">- Reduce</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th colspan="3" class="text-right">Total Price</th>
+                    <th>&#8377;@Model.TotalPrice</th>
+                </tr>
+            </tfoot>
+        </table>
+    }
+    else
+    {
+        <p>Your cart is empty.</p>
+    }
+
+    <div class="d-flex align-items-center justify-content-center gap-5">
+        <a asp-action="Index" asp-controller="Home" class="btn btn-primary">Continue Shopping</a>
+        @if (Model.CartItems.Any())
+        {
+            <a asp-action="Checkout" asp-controller="Orders" class="btn btn-success">Checkout</a>
+        }
+    </div>
+</div>
