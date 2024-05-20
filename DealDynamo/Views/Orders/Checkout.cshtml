@@ -1,12 +1,67 @@
-﻿@
-@{
-    ViewData["Title"] = "Checkout";
-}
+﻿@model DealDynamo.Models.OrderViewModels.OrderCheckoutViewModel;
 
-<div> 
-    <h2>
-     Checkout Page 
-    </h2>
+<h1>Checkout</h1>
 
+<div class="container d-flex align-items-center justify-content-around">
+    <div>
+            <h2 class="text-center">Cart Items</h2>
+            <ul>
+            @for (int i = 0; i < Model.CartItems.Count; i++)
+            {
+                <li>@Model.CartItems[i].Product.Title - Quantity: @Model.CartItems[i].Quantity</li>
 
+                <!-- Hidden inputs to post cart items -->
+                <input type="hidden" asp-for="CartItems[i].Id" />
+                <input type="hidden" asp-for="CartItems[i].Product.Id" />
+                <input type="hidden" asp-for="CartItems[i].Product.Title" />
+                <input type="hidden" asp-for="CartItems[i].Product.Price" />
+                <input type="hidden" asp-for="CartItems[i].Quantity" />
+            }
+            </ul>
+    </div>
+
+<div>
+    <h2 class="text-center">Address</h2>
+    <form asp-controller="Orders" asp-action="Checkout" method="post">
+ @for (int i = 0; i < Model.CartItems.Count; i++)
+            {
+
+                <!-- Hidden inputs to post cart items -->
+                <input type="hidden" asp-for="CartItems[i].Id" />
+                <input type="hidden" asp-for="CartItems[i].Product.Id" />
+                <input type="hidden" asp-for="CartItems[i].Product.Title" />
+                <input type="hidden" asp-for="CartItems[i].Product.Price" />
+                <input type="hidden" asp-for="CartItems[i].Quantity" />
+            }
+            </ul>
+
+        <div class="form-group">
+            <label class="form-label" for="Country">Country:</label>
+           <input class="form-control" type="text" asp-for="Address.Country" />
+           <span class="text-danger" asp-validation-for="Address.Country"></span>
+        </div>
+        <div class="form-group">
+            <label for="City">City:</label>
+           <input class="form-control" type="text" asp-for="Address.City" />
+           <span class="text-danger" asp-validation-for="Address.City"></span>
+        </div>
+        <div class="form-group">
+            <label class="form-label"  for="PostalCode">Postal Code:</label>
+           <input class="form-control" type="text" asp-for="Address.PostalCode" />
+           <span class="text-danger" asp-validation-for="Address.PostalCode"></span>
+        </div>
+        <div class="form-group">
+            <label class="form-label"  for="Street">Street:</label>
+           <input class="form-control" type="text" asp-for="Address.Street" />
+           <span class="text-danger" asp-validation-for="Address.Street"></span>
+        </div>
+        <div class="form-group">
+            <label class="form-label"  for="HouseNumber">House Number:</label>
+           <input class="form-control" type="text" asp-for="Address.HouseNumber" />
+           <span class="text-danger" asp-validation-for="Address.HouseNumber"></span>
+        </div>
+
+        <button class="btn btn-success mt-3" type="submit">Place Order</button>
+    </form>
+    </div>
 </div>

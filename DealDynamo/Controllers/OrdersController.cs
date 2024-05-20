@@ -1,11 +1,14 @@
 ﻿using DealDynamo.Areas.Identity.Data;
 using DealDynamo.Helper;
 using DealDynamo.Models;
+using DealDynamo.Models.OrderViewModels;
 using DealDynamo.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Stripe;
+using Stripe.Checkout;
 
 namespace DealDynamo.Controllers
 {
@@ -14,21 +17,16 @@ namespace DealDynamo.Controllers
     {
         private readonly IOrderRepository _orderRepository;
         private readonly UserManager<ApplicationUser> _userManager;
-        public OrdersController(IOrderRepository orderRepository)
+        public OrdersController(IOrderRepository orderRepository, UserManager<ApplicationUser> userManager)
         {
             _orderRepository = orderRepository;
+            _userManager = userManager;
         }
         // GET: OrdersController
         [Authorize(Roles = "Admin, Seller")]
         public ActionResult Index()
         {
             var orders = _orderRepository.GetAllOrder();
-            if (User.IsInRole("Seller"))
-            {
-                string userId = _userManager.GetUserId(User);
-                orders = orders.Where(x => x.SellerId == Guid.Parse(userId));
-                View(orders);
-            }
             return View(orders);
         }
 
@@ -43,23 +41,89 @@ namespace DealDynamo.Controllers
         // GET: OrdersController/Checkout
         public ActionResult Checkout()
         {
-            string userId = _userManager.GetUserId(User);
             var cart = HttpContext.Session.GetJson<List<AppCartItem>>("cart");
-            return View(cart);
+            OrderCheckoutViewModel vm = new OrderCheckoutViewModel()
+            {
+                CartItems = cart,
+                Address = new Models.Address(),
+            };
+            return View(vm);
         }
 
         // POST: OrdersController/Checkout
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public ActionResult Checkout(OrderCheckoutViewModel vm)
         {
             try
             {
-                return RedirectToAction(nameof(Index));
+                Order order = new Order()
+                {
+                    BuyerId = Guid.Parse(_userManager.GetUserId(User)),
+                    Address = vm.Address,
+                    OrderDate = DateTime.Now,
+                    OrderStatus = Models.Enums.OrderStatusEnum.Pending,
+                    ShippingDate = null,
+                    TotalPrice = vm.CartItems.Sum(x => x.Product.Price * x.Quantity),
+                    OrderItems = new List<OrderItems>(),
+                };
+                foreach (AppCartItem item in vm.CartItems)
+                {
+                    order.OrderItems.Add(new OrderItems()
+                    {
+                        PricePerUnit = item.Product.Price,
+                        ProductId = item.Product.Id,
+                        Quantity = item.Quantity,
+                    }
+                    );
+                }
+                _orderRepository.AddOrder(order);
+
+
+                var domain = "http://localhost:5035/";
+
+
+                var options = new SessionCreateOptions()
+                {
+                    SuccessUrl = domain + "Checkout/OrderConfirmation",
+                    CancelUrl = domain + "Checkout/Cancel",
+                    LineItems = new List<SessionLineItemOptions>(),
+                    Mode = "payment",
+                    ShippingAddressCollection = new SessionShippingAddressCollectionOptions
+                    {
+                        AllowedCountries = new List<string> { "US", "CA", "GB", "IN" } // Added "IN" for India
+                    },
+                };
+
+                foreach (var item in vm.CartItems)
+                {
+                    var sessionListItem = new SessionLineItemOptions()
+                    {
+                        PriceData = new SessionLineItemPriceDataOptions()
+                        {
+                            UnitAmount = (long)(item.Product.Price * item.Quantity),
+                            Currency = "inr",
+                            ProductData = new SessionLineItemPriceDataProductDataOptions()
+                            {
+                                Name = item.Product.Title,
+
+                            }
+
+                        },
+                        Quantity = item.Quantity
+                    };
+                    options.LineItems.Add(sessionListItem);
+                }
+
+                var service = new SessionService();
+                Session session = service.Create(options);
+
+                Response.Headers.Add("Location", session.Url);
+                return new StatusCodeResult(303);
             }
             catch
             {
-                return View();
+                return RedirectToAction(nameof(Checkout));
             }
         }
 

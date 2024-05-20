@@ -35,4 +35,5 @@ public class DealDynamoContext : IdentityDbContext<ApplicationUser>
     public DbSet<DealDynamo.Models.Order>? Orders { get; set; }
     public DbSet<DealDynamo.Models.Payments>? Payments { get; set; }
     public DbSet<DealDynamo.Models.CartItem>? CartItems { get; set; }
+    public DbSet<DealDynamo.Models.Address>? Addresses { get; set; }
 }

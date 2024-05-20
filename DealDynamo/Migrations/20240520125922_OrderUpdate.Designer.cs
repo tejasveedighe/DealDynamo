@@ -4,6 +4,7 @@ using DealDynamo.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DealDynamo.Migrations
 {
     [DbContext(typeof(DealDynamoContext))]
-    partial class DealDynamoContextModelSnapshot : ModelSnapshot
+    [Migration("20240520125922_OrderUpdate")]
+    partial class OrderUpdate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -126,7 +128,7 @@ namespace DealDynamo.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Addresses");
+                    b.ToTable("Address");
                 });
 
             modelBuilder.Entity("DealDynamo.Models.CartItem", b =>
@@ -195,8 +197,14 @@ namespace DealDynamo.Migrations
                     b.Property<int>("OrderStatus")
                         .HasColumnType("int");
 
-                    b.Property<int?>("PaymentId")
+                    b.Property<int>("PaymentId")
                         .HasColumnType("int");
+
+                    b.Property<Guid>("SellerId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("SellerId1")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime?>("ShippingDate")
                         .HasColumnType("datetime2");
@@ -209,6 +217,8 @@ namespace DealDynamo.Migrations
                     b.HasIndex("AddressId");
 
                     b.HasIndex("BuyerId1");
+
+                    b.HasIndex("SellerId1");
 
                     b.ToTable("Orders");
                 });
@@ -455,9 +465,15 @@ namespace DealDynamo.Migrations
                         .WithMany()
                         .HasForeignKey("BuyerId1");
 
+                    b.HasOne("DealDynamo.Areas.Identity.Data.ApplicationUser", "Seller")
+                        .WithMany()
+                        .HasForeignKey("SellerId1");
+
                     b.Navigation("Address");
 
                     b.Navigation("Buyer");
+
+                    b.Navigation("Seller");
                 });
 
             modelBuilder.Entity("DealDynamo.Models.OrderItems", b =>

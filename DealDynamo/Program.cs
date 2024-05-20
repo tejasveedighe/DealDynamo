@@ -3,6 +3,7 @@ using DealDynamo.Data;
 using DealDynamo.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Stripe;
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DealDynamoContextConnection") ?? throw new InvalidOperationException("Connection string 'DealDynamoContextConnection' not found.");
 
@@ -93,6 +94,7 @@ using (var scope = app.Services.CreateScope())
 }
 
 // Adding Stripe Payments
+StripeConfiguration.ApiKey = builder.Configuration.GetSection("Stripe:SecretKey").Get<string>();
 
 app.MapRazorPages();
 

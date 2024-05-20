@@ -1,10 +1,10 @@
 ﻿@model IEnumerable<DealDynamo.Models.Order>
 
 @{
-    ViewData["Title"] = "Orders";
+    ViewData["Title"] = "Index";
 }
 
-<h1>Orders</h1>
+<h1>Index</h1>
 
 <p>
     <a asp-action="Create">Create New</a>
@@ -16,9 +16,6 @@
                 @Html.DisplayNameFor(model => model.BuyerId)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.SellerId)
-            </th>
-            <th>
                 @Html.DisplayNameFor(model => model.TotalPrice)
             </th>
             <th>
@@ -28,13 +25,13 @@
                 @Html.DisplayNameFor(model => model.OrderStatus)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.ShippingAddress)
-            </th>
-            <th>
                 @Html.DisplayNameFor(model => model.OrderDate)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.ShippingDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Address)
             </th>
             <th></th>
         </tr>
@@ -46,9 +43,6 @@
                 @Html.DisplayFor(modelItem => item.BuyerId)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.SellerId)
-            </td>
-            <td>
                 @Html.DisplayFor(modelItem => item.TotalPrice)
             </td>
             <td>
@@ -58,13 +52,13 @@
                 @Html.DisplayFor(modelItem => item.OrderStatus)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.ShippingAddress)
-            </td>
-            <td>
                 @Html.DisplayFor(modelItem => item.OrderDate)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.ShippingDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Address.Id)
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
