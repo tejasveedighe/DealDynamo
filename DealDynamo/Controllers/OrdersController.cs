@@ -1,32 +1,54 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using DealDynamo.Areas.Identity.Data;
+using DealDynamo.Helper;
+using DealDynamo.Models;
+using DealDynamo.Services;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DealDynamo.Controllers
 {
+    [Authorize]
     public class OrdersController : Controller
     {
-        public OrdersController()
+        private readonly IOrderRepository _orderRepository;
+        private readonly UserManager<ApplicationUser> _userManager;
+        public OrdersController(IOrderRepository orderRepository)
         {
+            _orderRepository = orderRepository;
         }
         // GET: OrdersController
+        [Authorize(Roles = "Admin, Seller")]
         public ActionResult Index()
         {
-            return View();
+            var orders = _orderRepository.GetAllOrder();
+            if (User.IsInRole("Seller"))
+            {
+                string userId = _userManager.GetUserId(User);
+                orders = orders.Where(x => x.SellerId == Guid.Parse(userId));
+                View(orders);
+            }
+            return View(orders);
         }
 
         // GET: OrdersController/Details/5
+        [Authorize(Roles = "Admin, Seller")]
         public ActionResult Details(int id)
         {
-            return View();
+            var order = _orderRepository.GetOrderById(id);
+            return View(order);
         }
 
-        // GET: OrdersController/Create
-        public ActionResult Create()
+        // GET: OrdersController/Checkout
+        public ActionResult Checkout()
         {
-            return View();
+            string userId = _userManager.GetUserId(User);
+            var cart = HttpContext.Session.GetJson<List<AppCartItem>>("cart");
+            return View(cart);
         }
 
-        // POST: OrdersController/Create
+        // POST: OrdersController/Checkout
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Create(IFormCollection collection)

@@ -22,6 +22,7 @@ builder.Services.AddRazorPages();
 // Adding Repository Services
 builder.Services.AddTransient<ICategoryRepository, CategoryRepository>();
 builder.Services.AddTransient<IProductRepository, ProductRepository>();
+builder.Services.AddTransient<IOrderRepository, OrderRepository>();
 
 // Enabling Session
 builder.Services.AddSession();
@@ -90,6 +91,8 @@ using (var scope = app.Services.CreateScope())
         await userManager.AddToRoleAsync(user, "Admin");
     }
 }
+
+// Adding Stripe Payments
 
 app.MapRazorPages();
 

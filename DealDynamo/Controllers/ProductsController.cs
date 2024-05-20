@@ -61,7 +61,7 @@ namespace DealDynamo.Controllers
             return View(vm);
         }
 
-        // GET: ProductController/Create
+        // GET: ProductController/Checkout
         [Authorize(Roles = "Seller")]
         public ActionResult Create()
         {
@@ -72,7 +72,7 @@ namespace DealDynamo.Controllers
             return View(vm);
         }
 
-        // POST: ProductController/Create
+        // POST: ProductController/Checkout
         [Authorize(Roles = "Seller")]
         [HttpPost]
         [ValidateAntiForgeryToken]
