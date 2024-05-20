@@ -4,6 +4,7 @@ using DealDynamo.Models.ProductViewModels;
 using DealDynamo.Areas.Identity.Data;
 using DealDynamo.Models.UserViewModels;
 using DealDynamo.Models;
+using System.Reflection.Emit;
 
 namespace DealDynamo.Data;
 
@@ -20,11 +21,18 @@ public class DealDynamoContext : IdentityDbContext<ApplicationUser>
         // Customize the ASP.NET Identity model and override the defaults if needed.
         // For example, you can rename the ASP.NET Identity table names and more.
         // Add your customizations after calling base.OnModelCreating(builder);
+
+        builder.Entity<Order>()
+            .HasOne(o => o.Payment)
+            .WithOne(p => p.Order)
+            .HasForeignKey<Payments>(p => p.OrderId);
+
     }
 
     public DbSet<DealDynamo.Models.Category>? Category { get; set; }
     public DbSet<DealDynamo.Models.Product>? Product { get; set; }
-    public DbSet<DealDynamo.Models.UserViewModels.UserViewModel>? UserViewModel { get; set; }
-    public DbSet<DealDynamo.Models.UserViewModels.UserEditViewModel>? UserEditViewModel { get; set; }
-    public DbSet<DealDynamo.Models.CartItem>? CartItem { get; set; }
+    public DbSet<DealDynamo.Models.OrderItems>? OrderItems { get; set; }
+    public DbSet<DealDynamo.Models.Order>? Orders { get; set; }
+    public DbSet<DealDynamo.Models.Payments>? Payments { get; set; }
+    public DbSet<DealDynamo.Models.CartItem>? CartItems { get; set; }
 }

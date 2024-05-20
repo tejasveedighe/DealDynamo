@@ -1,9 +1,13 @@
-﻿using DealDynamo.Helper;
+﻿using DealDynamo.Areas.Identity.Data;
+using DealDynamo.Data;
+using DealDynamo.Helper;
 using DealDynamo.Models;
 using DealDynamo.Models.CartViewModels;
 using DealDynamo.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace DealDynamo.Controllers
 {
@@ -11,16 +15,46 @@ namespace DealDynamo.Controllers
     public class CartController : Controller
     {
         private readonly IProductRepository _productRepository;
+        private DealDynamoContext _db;
+        private UserManager<ApplicationUser> _userManager;
 
-        public CartController(IProductRepository productRepository)
+        public CartController(IProductRepository productRepository, DealDynamoContext db, UserManager<ApplicationUser> userManagerl)
         {
             _productRepository = productRepository;
+            _db = db;
+            _userManager = userManagerl;
+        }
+
+        private void GetCart()
+        {
+            string userId = _userManager.GetUserId(User);
+            if (string.IsNullOrEmpty(userId))
+            {
+                return;
+            }
+            var dbItems = _db.CartItems.Where(x => x.UserId == Guid.Parse(userId));
+            if (dbItems.Any())
+            {
+                var items = new List<AppCartItem>();
+                foreach (var item in dbItems.ToList())
+                {
+                    items.Add(new AppCartItem()
+                    {
+                        Id = item.Id,
+                        Product = _productRepository.GetProductById(item.ProductId),
+                        Quantity = item.Quantity,
+                    });
+
+                }
+                HttpContext.Session.SetJson("cart", items);
+            }
         }
 
         [AllowAnonymous]
         public IActionResult ViewCart()
         {
-            var cart = HttpContext.Session.GetJson<List<CartItem>>("cart") ?? new List<CartItem>();
+            GetCart();
+            var cart = HttpContext.Session.GetJson<List<AppCartItem>>("cart") ?? new List<AppCartItem>();
 
             var vm = new CartViewModel
             {
@@ -33,7 +67,7 @@ namespace DealDynamo.Controllers
 
         private int isExist(int id)
         {
-            var cart = HttpContext.Session.GetJson<List<CartItem>>("cart") ?? new List<CartItem>();
+            var cart = HttpContext.Session.GetJson<List<AppCartItem>>("cart") ?? new List<AppCartItem>();
             for (int i = 0; i < cart.Count; i++)
             {
                 if (cart[i].Product.Id == id)
@@ -53,15 +87,28 @@ namespace DealDynamo.Controllers
                 return NotFound();
             }
 
-            var cart = HttpContext.Session.GetJson<List<CartItem>>("cart") ?? new List<CartItem>();
+            GetCart();
+
+            var cart = HttpContext.Session.GetJson<List<AppCartItem>>("cart") ?? new List<AppCartItem>();
 
             int index = isExist(id);
             if (index != -1)
             {
                 var item = cart[index];
-                if (item.Product.Quantity < item.Quantity)
+                if (item.Product.Quantity > item.Quantity)
                 {
-                    cart[index].Quantity++;
+                    if (User.Identity.IsAuthenticated)
+                    {
+                        _db.CartItems.Update(new CartItem()
+                        {
+                            Id = item.Id,
+                            ProductId = item.Product.Id,
+                            Quantity = item.Quantity++,
+                        });
+                        _db.SaveChanges();
+                    }
+                    else
+                        cart[index].Quantity++;
                 }
                 else
                 {
@@ -70,7 +117,7 @@ namespace DealDynamo.Controllers
             }
             else
             {
-                cart.Add(new CartItem { Product = product, Quantity = 1 });
+                cart.Add(new AppCartItem { Product = product, Quantity = 1 });
             }
 
             HttpContext.Session.SetJson("cart", cart);
@@ -81,7 +128,7 @@ namespace DealDynamo.Controllers
         [AllowAnonymous]
         public IActionResult Remove(int id)
         {
-            var cart = HttpContext.Session.GetJson<List<CartItem>>("cart") ?? new List<CartItem>();
+            var cart = HttpContext.Session.GetJson<List<AppCartItem>>("cart") ?? new List<AppCartItem>();
             int index = isExist(id);
             if (index == -1)
             {
@@ -94,7 +141,21 @@ namespace DealDynamo.Controllers
                 {
                     return RedirectToAction(nameof(ViewCart));
                 }
-                cart.Remove(item);
+                else
+                {
+                    if (User.Identity.IsAuthenticated)
+                    {
+                        _db.CartItems.Remove(new CartItem()
+                        {
+                            Id = item.Id,
+                            ProductId = item.Product.Id,
+                            Quantity = item.Quantity,
+                        });
+                        _db.SaveChanges();
+                    }
+                    else
+                        cart.Remove(item);
+                }
             }
 
             HttpContext.Session.SetJson("cart", cart);
@@ -105,7 +166,7 @@ namespace DealDynamo.Controllers
         [AllowAnonymous]
         public IActionResult Decrease(int id)
         {
-            var cart = HttpContext.Session.GetJson<List<CartItem>>("cart") ?? new List<CartItem>();
+            var cart = HttpContext.Session.GetJson<List<AppCartItem>>("cart") ?? new List<AppCartItem>();
             int index = isExist(id);
             if (index == -1)
             {
@@ -115,8 +176,35 @@ namespace DealDynamo.Controllers
             {
                 var item = cart[index];
                 if (cart[index].Quantity > 1)
-                    cart[index].Quantity--;
-                else cart.Remove(item);
+                {
+                    if (User.Identity.IsAuthenticated)
+                    {
+                        _db.CartItems.Update(new CartItem()
+                        {
+                            Id = item.Id,
+                            ProductId = item.Product.Id,
+                            Quantity = item.Quantity--,
+                        });
+                        _db.SaveChanges();
+                    }
+                    else
+                        cart[index].Quantity--;
+
+                }
+                else
+                {
+                    if (User.Identity.IsAuthenticated)
+                    {
+                        _db.CartItems.Remove(new CartItem()
+                        {
+                            Id = item.Id,
+                            ProductId = item.Product.Id,
+                            Quantity = item.Quantity,
+                        });
+                    }
+                    else
+                        cart.Remove(item);
+                }
             }
             HttpContext.Session.SetJson("cart", cart);
             return RedirectToAction(nameof(ViewCart));
