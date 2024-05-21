@@ -79,20 +79,14 @@ namespace DealDynamo.Controllers
                 }
                 _orderRepository.AddOrder(order);
 
-
                 var domain = "http://localhost:5035/";
-
-
                 var options = new SessionCreateOptions()
                 {
                     SuccessUrl = domain + "Checkout/OrderConfirmation",
                     CancelUrl = domain + "Checkout/Cancel",
                     LineItems = new List<SessionLineItemOptions>(),
                     Mode = "payment",
-                    ShippingAddressCollection = new SessionShippingAddressCollectionOptions
-                    {
-                        AllowedCountries = new List<string> { "US", "CA", "GB", "IN" } // Added "IN" for India
-                    },
+                    BillingAddressCollection = "auto",
                 };
 
                 foreach (var item in vm.CartItems)
@@ -102,13 +96,11 @@ namespace DealDynamo.Controllers
                         PriceData = new SessionLineItemPriceDataOptions()
                         {
                             UnitAmount = (long)(item.Product.Price * item.Quantity),
-                            Currency = "inr",
+                            Currency = "USD",
                             ProductData = new SessionLineItemPriceDataProductDataOptions()
                             {
                                 Name = item.Product.Title,
-
                             }
-
                         },
                         Quantity = item.Quantity
                     };
@@ -167,6 +159,11 @@ namespace DealDynamo.Controllers
             {
                 return View();
             }
+        }
+
+        public IActionResult OrderConfirmation()
+        {
+            return View();
         }
     }
 }

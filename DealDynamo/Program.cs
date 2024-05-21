@@ -24,6 +24,7 @@ builder.Services.AddRazorPages();
 builder.Services.AddTransient<ICategoryRepository, CategoryRepository>();
 builder.Services.AddTransient<IProductRepository, ProductRepository>();
 builder.Services.AddTransient<IOrderRepository, OrderRepository>();
+builder.Services.AddTransient<ICartRepository, CartRepository>();
 
 // Enabling Session
 builder.Services.AddSession();
