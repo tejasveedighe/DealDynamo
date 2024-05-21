@@ -61,6 +61,14 @@
     </dl>
 </div>
 <div>
-    <a asp-controller="Cart" asp-action="AddToCart" asp-route-id="@Model?.Id">Add To Cart</a> |
+    @if(Model.Quantity > 0)
+    {
+        
+        <a asp-controller="Cart" asp-action="AddToCart" asp-route-id="@Model?.Id">Add To Cart</a>
+    } else
+    {
+        <span class="badge text-bg-danger">Sold Out</span>
+    }
+    |
     <a asp-action="Index">Back to List</a>
 </div>

@@ -13,6 +13,7 @@ namespace DealDynamo.Models
         public int AddressId { get; set; }
         public DateTime? OrderDate { get; set; }
         public DateTime? ShippingDate { get; set; }
+        public string BuyerId1 { get; set; }
 
         // Navigation properties
         public List<OrderItems> OrderItems { get; set; }

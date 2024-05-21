@@ -85,7 +85,7 @@ namespace DealDynamo.Controllers
                 {
                     if (User.Identity.IsAuthenticated)
                     {
-                        _cartRepository.AddCartItem(_userManager.GetUserId(User), item);
+                        _cartRepository.IncreaseQuantity(_userManager.GetUserId(User), item);
                     }
                     else
                         cart[index].Quantity++;
@@ -97,6 +97,11 @@ namespace DealDynamo.Controllers
             }
             else
             {
+                  if (User.Identity.IsAuthenticated)
+                    {
+                        _cartRepository.AddCartItem(_userManager.GetUserId(User), new AppCartItem() { Product = product, Quantity = 1});
+                    }
+
                 cart.Add(new AppCartItem { Product = product, Quantity = 1 });
             }
 
@@ -157,7 +162,6 @@ namespace DealDynamo.Controllers
                     }
                     else
                         cart[index].Quantity--;
-
                 }
                 else
                 {
@@ -177,7 +181,10 @@ namespace DealDynamo.Controllers
         public IActionResult Clear()
         {
             HttpContext.Session.Clear();
-            _cartRepository.ClearCart(_userManager.GetUserId(User));
+            if (User.Identity.IsAuthenticated)
+            {
+                _cartRepository.ClearCart(_userManager.GetUserId(User));
+            }
             return RedirectToAction(nameof(ViewCart));
         }
     }

@@ -32,13 +32,15 @@ namespace DealDynamo.Data
 
         public void DecreaseQuantity(string userId, AppCartItem item)
         {
-            _db.CartItems.Update(new CartItem()
+ var existingCartItem = _db.CartItems.SingleOrDefault(ci => ci.Id == item.Id && ci.UserId == Guid.Parse(userId));
+
+            if (existingCartItem != null)
             {
-                Id = item.Id,
-                ProductId = item.Product.Id,
-                Quantity = item.Quantity--,
-                UserId = Guid.Parse(userId),
-            });
+                // Update the quantity directly
+                existingCartItem.Quantity--;
+                _db.CartItems.Update(existingCartItem);
+            }
+
             SaveChanges();
         }
 
@@ -63,13 +65,14 @@ namespace DealDynamo.Data
 
         public void IncreaseQuantity(string userId, AppCartItem item)
         {
-            _db.CartItems.Update(new CartItem()
+           var existingCartItem = _db.CartItems.SingleOrDefault(ci => ci.Id == item.Id && ci.UserId == Guid.Parse(userId));
+
+            if (existingCartItem != null)
             {
-                Id = item.Id,
-                ProductId = item.Product.Id,
-                Quantity = item.Quantity++,
-                UserId = Guid.Parse(userId),
-            });
+                // Update the quantity directly
+                existingCartItem.Quantity++;
+                _db.CartItems.Update(existingCartItem);
+            }
             SaveChanges();
         }
 

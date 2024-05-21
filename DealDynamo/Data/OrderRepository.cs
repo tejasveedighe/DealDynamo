@@ -1,5 +1,6 @@
 ﻿using DealDynamo.Models;
 using DealDynamo.Services;
+using Microsoft.EntityFrameworkCore;
 
 namespace DealDynamo.Data
 {
@@ -19,6 +20,7 @@ namespace DealDynamo.Data
         public void DeleteOrder(Order order)
         {
             _context.Orders.Remove(order);
+            SaveChanges();
         }
 
         public IEnumerable<Order> GetAllOrder()
@@ -28,7 +30,10 @@ namespace DealDynamo.Data
 
         public Order GetOrderById(int id)
         {
-            return _context.Orders.FirstOrDefault(x => x.Id == id);
+            return _context.Orders.Include(o => o.OrderItems)
+                .Include(o => o.Payment)
+                .Include(o => o.Buyer)
+                .Include(o => o.Address).FirstOrDefault(x => x.Id == id);
         }
 
         public void SaveChanges()
@@ -39,6 +44,7 @@ namespace DealDynamo.Data
         public void UpdateOrder(Order order)
         {
             _context.Orders.Update(order);
+            SaveChanges();
         }
     }
 }

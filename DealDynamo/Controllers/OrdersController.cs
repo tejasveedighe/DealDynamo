@@ -16,11 +16,15 @@ namespace DealDynamo.Controllers
     public class OrdersController : Controller
     {
         private readonly IOrderRepository _orderRepository;
+        private readonly IProductRepository _productRepository;
+        private readonly ICartRepository _cartRepository;
         private readonly UserManager<ApplicationUser> _userManager;
-        public OrdersController(IOrderRepository orderRepository, UserManager<ApplicationUser> userManager)
+        public OrdersController(IOrderRepository orderRepository, UserManager<ApplicationUser> userManager, ICartRepository cartRepository, IProductRepository productRepository)
         {
             _orderRepository = orderRepository;
             _userManager = userManager;
+            _cartRepository = cartRepository;
+            _productRepository = productRepository;
         }
         // GET: OrdersController
         [Authorize(Roles = "Admin, Seller")]
@@ -82,11 +86,15 @@ namespace DealDynamo.Controllers
                 var domain = "http://localhost:5035/";
                 var options = new SessionCreateOptions()
                 {
-                    SuccessUrl = domain + "Checkout/OrderConfirmation",
-                    CancelUrl = domain + "Checkout/Cancel",
+                    SuccessUrl = domain + $"Orders/OrderConfirmation?orderId={order.Id}&sessionUrl=",
+                    CancelUrl = domain + "Orders/Cancel",
                     LineItems = new List<SessionLineItemOptions>(),
                     Mode = "payment",
                     BillingAddressCollection = "auto",
+                    ShippingAddressCollection = new SessionShippingAddressCollectionOptions()
+                    {
+                        AllowedCountries = new List<string> { "US" }
+                    },
                 };
 
                 foreach (var item in vm.CartItems)
@@ -161,9 +169,30 @@ namespace DealDynamo.Controllers
             }
         }
 
-        public IActionResult OrderConfirmation()
+        public IActionResult OrderConfirmation(int orderId)
         {
-            return View();
+            string userId = _userManager.GetUserId(User);
+            _cartRepository.ClearCart(userId);
+
+            var order = _orderRepository.GetOrderById(orderId);
+            order.Payment = new Payments()
+            {
+                Amount = order.TotalPrice,
+                Order = order,
+                OrderId = order.Id,
+                PaymentDate = DateTime.Now,
+                Status = Models.Enums.PaymentStatusEnum.Complete,
+            };
+            _orderRepository.UpdateOrder(order);
+
+            foreach (var item in order.OrderItems)
+            {
+                var product = item.Product;
+                product.Quantity -= item.Quantity;
+                _productRepository.UpdateProduct(product);
+            }
+
+            return View(order);
         }
     }
 }

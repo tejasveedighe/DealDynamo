@@ -48,6 +48,7 @@ namespace DealDynamo.Data
         public void UpdateProduct(Product category)
         {
             _db.Product.Update(category);
+            SaveChanges();
         }
     }
 }
