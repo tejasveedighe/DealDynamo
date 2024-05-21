@@ -30,7 +30,7 @@ namespace DealDynamo.Data
 
         public Order GetOrderById(int id)
         {
-            return _context.Orders.Include(o => o.OrderItems)
+            return _context.Orders.Include(o => o.OrderItems).ThenInclude(o => o.Product)
                 .Include(o => o.Payment)
                 .Include(o => o.Buyer)
                 .Include(o => o.Address).FirstOrDefault(x => x.Id == id);

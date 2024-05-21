@@ -9,6 +9,7 @@ namespace DealDynamo.Models
         public decimal Amount { get; set; }
         public PaymentStatusEnum Status { get; set; }
         public DateTime? PaymentDate { get; set; }
+        public string? StripePaymentId { get; set; }
 
         // Navigation property
         public Order Order { get; set; }

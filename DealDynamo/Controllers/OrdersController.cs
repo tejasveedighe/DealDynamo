@@ -42,52 +42,38 @@ namespace DealDynamo.Controllers
             return View(order);
         }
 
-        // GET: OrdersController/Checkout
-        public ActionResult Checkout()
-        {
-            var cart = HttpContext.Session.GetJson<List<AppCartItem>>("cart");
-            OrderCheckoutViewModel vm = new OrderCheckoutViewModel()
-            {
-                CartItems = cart,
-                Address = new Models.Address(),
-            };
-            return View(vm);
-        }
-
-        // POST: OrdersController/Checkout
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Checkout(OrderCheckoutViewModel vm)
+        [Authorize(Roles = "Buyer")]
+        public IActionResult Checkout()
         {
             try
             {
+                var cart = HttpContext.Session.GetJson<List<AppCartItem>>("cart");
                 Order order = new Order()
                 {
                     BuyerId = Guid.Parse(_userManager.GetUserId(User)),
-                    Address = vm.Address,
                     OrderDate = DateTime.Now,
                     OrderStatus = Models.Enums.OrderStatusEnum.Pending,
                     ShippingDate = null,
-                    TotalPrice = vm.CartItems.Sum(x => x.Product.Price * x.Quantity),
+                    TotalPrice = cart.Sum(x => x.Product.Price * x.Quantity),
                     OrderItems = new List<OrderItems>(),
+                    Address = new Models.Address() { City = "", Country = "", HouseNumber = "", PostalCode = "", Street = "" },
                 };
-                foreach (AppCartItem item in vm.CartItems)
+                foreach (var item in cart)
                 {
                     order.OrderItems.Add(new OrderItems()
                     {
                         PricePerUnit = item.Product.Price,
                         ProductId = item.Product.Id,
                         Quantity = item.Quantity,
-                    }
-                    );
+                    });
                 }
                 _orderRepository.AddOrder(order);
 
                 var domain = "http://localhost:5035/";
                 var options = new SessionCreateOptions()
                 {
-                    SuccessUrl = domain + $"Orders/OrderConfirmation?orderId={order.Id}&sessionUrl=",
-                    CancelUrl = domain + "Orders/Cancel",
+                    SuccessUrl = domain + $"Orders/OrderConfirmation?orderId={order.Id}&sessionId={{CHECKOUT_SESSION_ID}}",
+                    CancelUrl = domain + $"Orders/Cancel?orderId={order.Id}",
                     LineItems = new List<SessionLineItemOptions>(),
                     Mode = "payment",
                     BillingAddressCollection = "auto",
@@ -97,7 +83,7 @@ namespace DealDynamo.Controllers
                     },
                 };
 
-                foreach (var item in vm.CartItems)
+                foreach (var item in cart)
                 {
                     var sessionListItem = new SessionLineItemOptions()
                     {
@@ -108,6 +94,7 @@ namespace DealDynamo.Controllers
                             ProductData = new SessionLineItemPriceDataProductDataOptions()
                             {
                                 Name = item.Product.Title,
+                                Description = item.Product.Description,
                             }
                         },
                         Quantity = item.Quantity
@@ -169,19 +156,32 @@ namespace DealDynamo.Controllers
             }
         }
 
-        public IActionResult OrderConfirmation(int orderId)
+        public IActionResult OrderConfirmation(int orderId, string sessionId)
         {
+
+            var sessionService = new Stripe.Checkout.SessionService();
+            var session = sessionService.Get(sessionId);
+
             string userId = _userManager.GetUserId(User);
             _cartRepository.ClearCart(userId);
 
             var order = _orderRepository.GetOrderById(orderId);
+            if (order == null) return Problem("Order Not Found, please try later");
+
+            order.Address.Country = session.ShippingDetails.Address.Country;
+            order.Address.Street = session.ShippingDetails.Address.Line2;
+            order.Address.City = session.ShippingDetails.Address.City;
+            order.Address.HouseNumber = session.ShippingDetails.Address.Line1;
+            order.Address.PostalCode = session.ShippingDetails.Address.PostalCode;
+
             order.Payment = new Payments()
             {
                 Amount = order.TotalPrice,
                 Order = order,
                 OrderId = order.Id,
                 PaymentDate = DateTime.Now,
-                Status = Models.Enums.PaymentStatusEnum.Complete,
+                Status = session.PaymentStatus == "paid" ? Models.Enums.PaymentStatusEnum.Complete : Models.Enums.PaymentStatusEnum.Failed,
+                StripePaymentId = session.PaymentIntentId,
             };
             _orderRepository.UpdateOrder(order);
 
@@ -192,6 +192,23 @@ namespace DealDynamo.Controllers
                 _productRepository.UpdateProduct(product);
             }
 
+            return View(order);
+        }
+
+        public IActionResult Cancel(int orderId)
+        {
+            var order = _orderRepository.GetOrderById(orderId);
+            order.OrderStatus = Models.Enums.OrderStatusEnum.Cancelled;
+            order.Payment = new Payments()
+            {
+                Amount = order.TotalPrice,
+                Order = order,
+                OrderId = order.Id,
+                PaymentDate = DateTime.Now,
+                Status = Models.Enums.PaymentStatusEnum.Failed,
+                StripePaymentId = null,
+            };
+            _orderRepository.UpdateOrder(order);
             return View(order);
         }
     }
