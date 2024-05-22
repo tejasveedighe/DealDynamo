@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Stripe;
 using Stripe.Checkout;
+using System.Collections.Generic;
+using System.Security.Claims;
 
 namespace DealDynamo.Controllers
 {
@@ -26,12 +28,35 @@ namespace DealDynamo.Controllers
             _cartRepository = cartRepository;
             _productRepository = productRepository;
         }
+
         // GET: OrdersController
         [Authorize(Roles = "Admin, Seller")]
-        public ActionResult Index()
+        public async Task<IActionResult> Index(int currentPage = 1, int pageSize = 10)
         {
-            var orders = _orderRepository.GetAllOrder();
-            return View(orders);
+            var user = await _userManager.GetUserAsync(User);
+            IEnumerable<Order> orders;
+            if (User.IsInRole("Seller"))
+            {
+                orders = _orderRepository.GetOrdersBySellerId(user.Id);
+            }
+            else
+            {
+                orders = _orderRepository.GetAllOrder();
+            }
+            var totalOrders = orders.Count();
+            var totalPages = (int)Math.Ceiling((double)totalOrders / 10);
+
+            var paginatedOrders = orders.Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
+
+            var vm = new OrderListViewModel()
+            {
+                Orders = paginatedOrders,
+                CurrentPage = currentPage,
+                TotalPages = totalPages,
+                PageSize = pageSize,
+            };
+
+            return View(vm);
         }
 
         // GET: OrdersController/Details/5
@@ -43,14 +68,15 @@ namespace DealDynamo.Controllers
         }
 
         [Authorize(Roles = "Buyer")]
-        public IActionResult Checkout()
+        public async Task<IActionResult> Checkout()
         {
             try
             {
                 var cart = HttpContext.Session.GetJson<List<AppCartItem>>("cart");
+                var user = await _userManager.GetUserAsync(User);
                 Order order = new Order()
                 {
-                    BuyerId = Guid.Parse(_userManager.GetUserId(User)),
+                    Buyer = user,
                     OrderDate = DateTime.Now,
                     OrderStatus = Models.Enums.OrderStatusEnum.Pending,
                     ShippingDate = null,
@@ -65,6 +91,7 @@ namespace DealDynamo.Controllers
                         PricePerUnit = item.Product.Price,
                         ProductId = item.Product.Id,
                         Quantity = item.Quantity,
+                        SellerId = item.Product.SellerID.ToString(),
                     });
                 }
                 _orderRepository.AddOrder(order);
@@ -73,7 +100,7 @@ namespace DealDynamo.Controllers
                 var options = new SessionCreateOptions()
                 {
                     SuccessUrl = domain + $"Orders/OrderConfirmation?orderId={order.Id}&sessionId={{CHECKOUT_SESSION_ID}}",
-                    CancelUrl = domain + $"Orders/Cancel?orderId={order.Id}",
+                    CancelUrl = domain + $"Orders/Cancel?orderId={order.Id}&sessionId={{CHECKOUT_SESSION_ID}}",
                     LineItems = new List<SessionLineItemOptions>(),
                     Mode = "payment",
                     BillingAddressCollection = "auto",
@@ -81,6 +108,7 @@ namespace DealDynamo.Controllers
                     {
                         AllowedCountries = new List<string> { "US" }
                     },
+                    CustomerEmail = user.Email,
                 };
 
                 foreach (var item in cart)
@@ -115,30 +143,39 @@ namespace DealDynamo.Controllers
         }
 
         // GET: OrdersController/Edit/5
+        [Authorize(Roles = "Admin")]
         public ActionResult Edit(int id)
         {
-            return View();
+            var order = _orderRepository.GetOrderById(id);
+            return View(order);
         }
 
         // POST: OrdersController/Edit/5
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public ActionResult Edit(Order order)
         {
             try
             {
-                return RedirectToAction(nameof(Index));
+                var dbOrder = _orderRepository.GetOrderById(order.Id);
+                dbOrder.OrderStatus = order.OrderStatus;
+                dbOrder.ShippingDate = order.ShippingDate;
+                _orderRepository.UpdateOrder(dbOrder);
+
+                return RedirectToAction(nameof(Edit));
             }
             catch
             {
-                return View();
+                return RedirectToAction(nameof(Edit));
             }
         }
 
         // GET: OrdersController/Delete/5
         public ActionResult Delete(int id)
         {
-            return View();
+            var order = _orderRepository.GetOrderById(id);
+            return View(order);
         }
 
         // POST: OrdersController/Delete/5
@@ -148,6 +185,8 @@ namespace DealDynamo.Controllers
         {
             try
             {
+                var order = _orderRepository.GetOrderById(id);
+                _orderRepository.DeleteOrder(order);
                 return RedirectToAction(nameof(Index));
             }
             catch
@@ -158,7 +197,6 @@ namespace DealDynamo.Controllers
 
         public IActionResult OrderConfirmation(int orderId, string sessionId)
         {
-
             var sessionService = new Stripe.Checkout.SessionService();
             var session = sessionService.Get(sessionId);
 
@@ -195,10 +233,15 @@ namespace DealDynamo.Controllers
             return View(order);
         }
 
-        public IActionResult Cancel(int orderId)
+        public IActionResult Cancel(int orderId, string sessionId)
         {
+            var sessionService = new Stripe.Checkout.SessionService();
+            var session = sessionService.Get(sessionId);
+
             var order = _orderRepository.GetOrderById(orderId);
+
             order.OrderStatus = Models.Enums.OrderStatusEnum.Cancelled;
+
             order.Payment = new Payments()
             {
                 Amount = order.TotalPrice,

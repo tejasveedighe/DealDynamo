@@ -6,7 +6,7 @@ namespace DealDynamo.Models
     public class Order
     {
         public int Id { get; set; }
-        public Guid BuyerId { get; set; }
+        public string BuyerId { get; set; }
         public decimal TotalPrice { get; set; }
         public int? PaymentId { get; set; }
         public OrderStatusEnum OrderStatus { get; set; }

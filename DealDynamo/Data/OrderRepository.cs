@@ -25,15 +25,29 @@ namespace DealDynamo.Data
 
         public IEnumerable<Order> GetAllOrder()
         {
-            return _context.Orders.ToList();
+            return _context.Orders.Include(o => o.OrderItems).ThenInclude(o => o.Product)
+                .Include(o => o.Payment)
+                .Include(o => o.Buyer).Include(o => o.Address).ToList();
         }
 
         public Order GetOrderById(int id)
         {
-            return _context.Orders.Include(o => o.OrderItems).ThenInclude(o => o.Product)
+            return _context.Orders.Include(o => o.OrderItems)
+                .ThenInclude(o => o.Seller)
+                .Include(o => o.OrderItems)
+                .ThenInclude(o => o.Product)
                 .Include(o => o.Payment)
                 .Include(o => o.Buyer)
                 .Include(o => o.Address).FirstOrDefault(x => x.Id == id);
+        }
+
+        public IEnumerable<Order> GetOrdersBySellerId(string sellerId)
+        {
+            return _context.Orders.Include(o => o.OrderItems)
+                .Include(o => o.Buyer)
+                .Include(o => o.Payment)
+                .Include(o => o.Address)
+                .Where(o => o.OrderItems.Any(oi => oi.SellerId == sellerId));
         }
 
         public void SaveChanges()

@@ -1,0 +1,127 @@
+﻿@using DealDynamo.Models.Enums
+@model DealDynamo.Models.Order
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit Order</h1>
+
+<h4>Order</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <form asp-action="Edit" method="post" class="row container-fluid d-grid">
+            <div class="col">
+                <div class="form-group">
+                    <label asp-for="Id" class="control-label"></label>
+                    <input asp-for="Id" class="form-control" readonly />
+                </div>
+@*                 <div class="form-group">
+                    <label asp-for="Buyer.UserName" class="control-label"></label>
+                    <input asp-for="Buyer.UserName" class="form-control" readonly />
+                </div>
+ *@                <div class="form-group">
+                    <label asp-for="TotalPrice" class="control-label"></label>
+                    <input asp-for="TotalPrice" class="form-control" readonly />
+                </div>
+                <div class="form-group">
+                    <label asp-for="OrderStatus" class="control-label"></label>
+                    <select asp-for="OrderStatus" class="form-control" asp-items="@Html.GetEnumSelectList<OrderStatusEnum>()"></select>
+                </div>
+                <div class="form-group">
+                    <label asp-for="OrderDate" class="control-label"></label>
+                    <input asp-for="OrderDate" class="form-control" readonly />
+                </div>
+                <div class="form-group">
+                    <label asp-for="ShippingDate" class="control-label"></label>
+                    <input asp-for="ShippingDate" class="form-control" id="datePicker" />
+                </div>
+             @*    <input asp-for="Order.AddressId" hidden />
+                <div class="form-group">
+                    <label asp-for="Order.Address.HouseNumber" class="control-label"></label>
+                    <input asp-for="Order.Address.HouseNumber" class="form-control" readonly />
+                </div>
+                <div class="form-group">
+                    <label asp-for="Order.Address.Street" class="control-label"></label>
+                    <input asp-for="Order.Address.Street" class="form-control" readonly />
+                </div>
+                <div class="form-group">
+                    <label asp-for="Order.Address.City" class="control-label"></label>
+                    <input asp-for="Order.Address.City" class="form-control" readonly />
+                </div>
+                <div class="form-group">
+                    <label asp-for="Order.Address.Country" class="control-label"></label>
+                    <input asp-for="Order.Address.Country" class="form-control" readonly />
+                </div>
+                <div class="form-group">
+                    <label asp-for="Order.Address.PostalCode" class="control-label"></label>
+                    <input asp-for="Order.Address.PostalCode" class="form-control" readonly />
+                </div> *@
+            </div>
+
+          @*   <div class="col">
+                <input asp-for="Order.Payment.Id" hidden />
+                <input asp-for="Order.Payment.StripePaymentId" hidden />
+                <input asp-for="Order.Payment.OrderId" hidden />
+                <input asp-for="Order.Payment.Order" hidden />
+                <div class="form-group">
+                    <label asp-for="Order.Payment.PaymentDate" class="control-label"></label>
+                    <input asp-for="Order.Payment.PaymentDate" class="form-control" readonly />
+                </div>
+                <div class="form-group">
+                    <label asp-for="Order.Payment.Status" class="control-label"></label>
+                    <input asp-for="Order.Payment.Status" class="form-control" readonly />
+                </div>
+                <div class="form-group">
+                    <label asp-for="Order.Payment.Amount" class="control-label"></label>
+                    <input asp-for="Order.Payment.Amount" class="form-control" readonly />
+                </div>
+            </div>
+ *@
+            <div class="col">
+               @*  <h4>Order Items</h4>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Price Per Unit</th>
+                            <th>Quantity</th>
+                            <th>Seller</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (int i = 0; i < Model.Order.OrderItems.Count; i++)
+                        {
+                            <tr>
+                                <input asp-for="Order.OrderItems[@i].ProductId" hidden />
+                                <td>@Model.Order.OrderItems[i].Product.Title</td>
+                                <input asp-for="Order.OrderItems[@i].PricePerUnit" hidden />
+                                <td>@Model.Order.OrderItems[i].PricePerUnit</td>
+                                <input asp-for="Order.OrderItems[@i].Quantity" hidden />
+                                <td>@Model.Order.OrderItems[i].Quantity</td>
+                                <input asp-for="Order.OrderItems[@i].SellerId" hidden />
+                                <td>@Model.Order.OrderItems[i].Seller.UserName</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table> *@
+                <div class="form-group">
+                    <input type="submit" value="Save" class="btn btn-primary" />
+                </div>
+                <div>
+                    <a asp-action="Index">Back to List</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(function () {
+            $("#datePicker").datepicker();
+        })
+    </script>
+}

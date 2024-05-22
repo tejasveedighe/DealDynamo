@@ -1,4 +1,6 @@
-﻿namespace DealDynamo.Models
+﻿using DealDynamo.Areas.Identity.Data;
+
+namespace DealDynamo.Models
 {
     public class OrderItems
     {
@@ -11,5 +13,7 @@
         // Navigation property
         public Order Order { get; set; }
         public Product Product { get; set; }
+        public ApplicationUser Seller { get; set; }
+        public string SellerId { get; set; }
     }
 }
