@@ -2,6 +2,6 @@
 {
     public enum PaymentStatusEnum
     {
-        Pending, Complete, Failed
+        Pending, Complete, Failed, Refunded
     }
 }

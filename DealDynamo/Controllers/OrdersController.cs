@@ -254,5 +254,42 @@ namespace DealDynamo.Controllers
             _orderRepository.UpdateOrder(order);
             return View(order);
         }
+
+        [Authorize(Roles = "Buyer")]
+        public IActionResult ViewOrders(int currentPage = 1, int pageSize = 10)
+        {
+            var userId = _userManager.GetUserId(User);
+            var orders = _orderRepository.GetAllOrder().Where(x => x.BuyerId == userId).ToList();
+
+            var totalOrders = orders.Count();
+            var totalPages = (int)Math.Ceiling((double)totalOrders / 10);
+
+            var paginatedOrders = orders.Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
+
+            var vm = new OrderListViewModel()
+            {
+                Orders = paginatedOrders,
+                CurrentPage = currentPage,
+                TotalPages = totalPages,
+                PageSize = pageSize,
+            };
+
+            return View(vm);
+        }
+
+        public IActionResult OrderDetails(int id)
+        {
+            var order = _orderRepository.GetOrderById(id);
+            return View(order);
+        }
+        public IActionResult CancelOrder(int id)
+        {
+            var order = _orderRepository.GetOrderById(id);
+            order.OrderStatus = Models.Enums.OrderStatusEnum.Cancelled;
+            order.Payment.Status = Models.Enums.PaymentStatusEnum.Refunded;
+            _orderRepository.UpdateOrder(order);
+
+            return RedirectToAction(nameof(OrderDetails), new { id });
+        }
     }
 }

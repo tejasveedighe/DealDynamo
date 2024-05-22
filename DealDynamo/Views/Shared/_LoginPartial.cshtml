@@ -14,6 +14,10 @@
     <li class="nav-item">
             <a id="cart" class="nav-link text-dark" asp-area="" asp-action="ViewCart" asp-controller="Cart">My Cart</a>
     </li>
+     <li class="nav-item">
+            <a id="order" class="nav-link text-dark" asp-area="" asp-action="ViewOrders" asp-controller="Orders">My Orders</a>
+    </li>
+
     }
     @if (SignInManager.IsSignedIn(User) )
     {
