@@ -23,7 +23,7 @@ namespace DealDynamo.Controllers
             _categoryRepository = categoryRepository;
         }
 
-        public async Task<IActionResult> Index(int currentPage = 1, int pageSize = 12)
+        public async Task<IActionResult> Index(int currentPage = 1, int pageSize = 10)
         {
             var user = await UserManager.GetUserAsync(User);
 

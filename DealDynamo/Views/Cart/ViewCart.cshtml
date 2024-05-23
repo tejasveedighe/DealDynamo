@@ -17,7 +17,6 @@
             <thead>
                 <tr>
                     <th>Product Name</th>
-                    <th>Quantity</th>
                     <th>Price</th>
                     <th>Subtotal</th>
                     <th>Actions</th>
@@ -27,14 +26,20 @@
                 @foreach (var item in Model.CartItems)
                 {
                     <tr>
-                        <td>@item.Product.Title</td>
-                        <td>@item.Quantity</td>
+                        <td>
+                           <img src="~/images/@item.Product.ProductImage" width="150"/>
+                        </td>
                         <td>&#8377;@item.Product.Price</td>
                         <td>&#8377;@(item.Product.Price * item.Quantity)</td>
-                        <td>
-                            <a asp-action="Remove" asp-route-id="@item.Product.Id" class="text-danger">Remove</a>
-                            <a asp-action="AddToCart" asp-route-id="@item.Product.Id">+ Add</a>
-                            <a asp-action="Decrease" asp-route-id="@item.Product.Id">- Reduce</a>
+                        <td class="d-flex align-items-center justify-content-between">
+                            <span>
+                                <a class="text-bg-light text-black border rounded-circle" style="padding: 2px 5px;" asp-action="AddToCart" asp-route-id="@item.Product.Id"><i class="fa-solid fa-plus"></i></a>
+                                    <span>
+                                        @item.Quantity
+                                    </span>
+                                <a class="text-bg-light text-black border rounded-circle" style="padding: 2px 5px;" asp-action="Decrease" asp-route-id="@item.Product.Id"><i class="fa-solid fa-minus"></i></a>
+                            </span>
+                            <a asp-action="Remove" asp-route-id="@item.Product.Id" class="text-danger"><i class="fa-solid fa-trash"></i>Remove</a>
                         </td>
                     </tr>
                 }

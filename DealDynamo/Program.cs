@@ -10,7 +10,11 @@ var connectionString = builder.Configuration.GetConnectionString("DealDynamoCont
 builder.Services.AddDbContext<DealDynamoContext>(options =>
 options.UseSqlServer(connectionString));
 
-builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
+builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
+{
+    options.SignIn.RequireConfirmedAccount = false;
+    options.SignIn.RequireConfirmedEmail = false;
+})
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<DealDynamoContext>();
 
