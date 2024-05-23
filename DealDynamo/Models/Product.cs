@@ -13,5 +13,8 @@ namespace DealDynamo.Models
         public int? CategoryID { get; set; }
         public Guid SellerID { get; set; }
         public int Price { get; set; }
+
+        // Navigation Property
+        public ICollection<ProductReview> ProductReviews { get; set; }
     }
 }

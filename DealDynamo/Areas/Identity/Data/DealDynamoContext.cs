@@ -27,6 +27,16 @@ public class DealDynamoContext : IdentityDbContext<ApplicationUser>
             .WithOne(p => p.Order)
             .HasForeignKey<Payments>(p => p.OrderId);
 
+        builder.Entity<ProductReview>()
+          .HasOne(pr => pr.Product)
+          .WithMany(p => p.ProductReviews)
+          .HasForeignKey(pr => pr.ProductID);
+
+        builder.Entity<ProductReview>()
+            .HasOne(pr => pr.User)
+            .WithMany(u => u.ProductReviews)
+            .HasForeignKey(pr => pr.UserId);
+
     }
 
     public DbSet<DealDynamo.Models.Category>? Category { get; set; }
@@ -36,4 +46,5 @@ public class DealDynamoContext : IdentityDbContext<ApplicationUser>
     public DbSet<DealDynamo.Models.Payments>? Payments { get; set; }
     public DbSet<DealDynamo.Models.CartItem>? CartItems { get; set; }
     public DbSet<DealDynamo.Models.Address>? Addresses { get; set; }
+    public DbSet<DealDynamo.Models.ProductReview>? ProductReviews { get; set; }
 }

@@ -8,7 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DealDynamoContextConnection") ?? throw new InvalidOperationException("Connection string 'DealDynamoContextConnection' not found.");
 
 builder.Services.AddDbContext<DealDynamoContext>(options =>
-    options.UseSqlServer(connectionString));
+options.UseSqlServer(connectionString));
 
 builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddRoles<IdentityRole>()
@@ -26,6 +26,7 @@ builder.Services.AddTransient<IProductRepository, ProductRepository>();
 builder.Services.AddTransient<IOrderRepository, OrderRepository>();
 builder.Services.AddTransient<ICartRepository, CartRepository>();
 builder.Services.AddTransient<IPaymentsRepository, PaymentsRepository>();
+builder.Services.AddTransient<IProductReviewRepository, ProductReviewRepository>();
 
 // Enabling Session
 builder.Services.AddSession();

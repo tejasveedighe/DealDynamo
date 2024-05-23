@@ -1,5 +1,6 @@
 ﻿using DealDynamo.Models;
 using DealDynamo.Services;
+using Microsoft.EntityFrameworkCore;
 
 namespace DealDynamo.Data
 {
@@ -37,7 +38,7 @@ namespace DealDynamo.Data
 
         public Product GetProductById(int? id)
         {
-            return _db.Product.SingleOrDefault(x => x.Id == id);
+            return _db.Product.Include(p => p.ProductReviews).ThenInclude(pr => pr.User).SingleOrDefault(x => x.Id == id);
         }
 
         public void SaveChanges()
