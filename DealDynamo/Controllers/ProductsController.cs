@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Drawing.Printing;
 
 namespace DealDynamo.Controllers
 {
@@ -30,7 +31,7 @@ namespace DealDynamo.Controllers
         }
         // GET: ProductController
         [HttpGet]
-        public async Task<ActionResult> Index()
+        public async Task<ActionResult> Index(int currentPage = 1, int pageSize = 10)
         {
             IEnumerable<Product> products = _productRepository.GetAllProducts();
 
@@ -41,7 +42,25 @@ namespace DealDynamo.Controllers
                 products = products.Where(x => x.SellerID == currentSellerId);
             }
 
-            return View(products);
+            // Calculate total pages
+            int totalProducts = products.Count();
+            int totalPages = (int)Math.Ceiling(totalProducts / (double)pageSize);
+
+            // Paginate the product list
+            var paginatedProducts = products
+                .Skip((currentPage - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            var viewModel = new ProductListViewModel
+            {
+                Products = paginatedProducts,
+                CurrentPage = currentPage,
+                TotalPages = totalPages,
+                PageSize = pageSize
+            };
+
+            return View(viewModel);
         }
 
         // GET: ProductController/Details/5

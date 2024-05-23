@@ -63,12 +63,15 @@
 <div>
     @if(Model.Quantity > 0)
     {
-        
         <a asp-controller="Cart" asp-action="AddToCart" asp-route-id="@Model?.Id">Add To Cart</a>
     } else
     {
         <span class="badge text-bg-danger">Sold Out</span>
     }
     |
+    @if(User.IsInRole("Buyer"))
+    {
+        <a asp-action="AddReview" asp-controller="Review" asp-route-id="@Model?.Id">Add Review</a> <text>|</text>
+    }
     <a asp-action="Index">Back to List</a>
 </div>

@@ -1,38 +1,35 @@
-﻿@model DealDynamo.Models.OrderViewModels.OrderListViewModel
+﻿@model DealDynamo.Models.PaymentViewModels.PaymentListViewModel
 
 @{
-    ViewData["Title"] = "Orders";
+    ViewData["Title"] = "Payments";
 }
 
-<h1>Orders</h1>
+<h1>Payments</h1>
 
 <table class="table table-bordered">
     <thead>
         <tr>
+            <th>Payment ID</th>
             <th>Order ID</th>
-            <th>Buyer</th>
-            <th>Total Price</th>
-            <th>Order Date</th>
-            <th>Order Status</th>
-            <th>Payment Status</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th>Payment Date</th>
+            <th>Stripe Payment ID</th>
             <th>Actions</th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var order in Model.Orders)
+        @foreach (var payment in Model.Payments)
         {
             <tr>
-                <td>@order.Id</td>
-                @if (order?.Buyer?.UserName != null) { <td>@order?.Buyer?.UserName</td> } else {
-                    <td></td>
-                }
-                <td>@order.TotalPrice.ToString("C")</td>
-                <td>@order.OrderDate?.ToString("g")</td>
-                <td>@order.OrderStatus</td>
-                <td>@order?.Payment?.Status</td>
+                <td>@payment.Id</td>
+                <td>@payment.OrderId</td>
+                <td>@payment.Amount.ToString("C")</td>
+                <td>@payment.Status</td>
+                <td>@payment.PaymentDate?.ToString("g")</td>
+                <td>@payment.StripePaymentId</td>
                 <td>
-                    <a href="@Url.Action("Details", "Orders", new { id = order.Id })" class="btn btn-info">View</a>
-                    <a href="@Url.Action("Delete", "Orders", new { id = order.Id })" class="btn btn-danger">Delete</a>
+                    <a href="@Url.Action("Details", "Payments", new { id = payment.Id })" class="btn btn-info">View</a>
                 </td>
             </tr>
         }
