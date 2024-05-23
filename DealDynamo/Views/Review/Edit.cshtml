@@ -14,14 +14,21 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="ID" />
             <div class="form-group">
-                <label asp-for="ProductID" class="control-label"></label>
-                <select asp-for="ProductID" class="form-control" asp-items="ViewBag.ProductID"></select>
+                <label asp-for="ProductID" class="control-label" hidden></label>
+                <select asp-for="ProductID" class="form-control" hidden asp-items="ViewBag.ProductID"></select>
                 <span asp-validation-for="ProductID" class="text-danger"></span>
+
+
+                <label class="control-label">Product Title</label>
+                <input class="form-control" readonly value="@Model.Product?.Title"></input>
             </div>
             <div class="form-group">
-                <label asp-for="UserId" class="control-label"></label>
-                <select asp-for="UserId" class="form-control" asp-items="ViewBag.UserId"></select>
+                <label asp-for="UserId" class="control-label" hidden></label>
+                <select asp-for="UserId" class="form-control" hidden asp-items="ViewBag.UserId"></select>
                 <span asp-validation-for="UserId" class="text-danger"></span>
+
+                <label class="control-label">User Name</label>
+                <input class="form-control" readonly value="@Model.User?.UserName"></input>
             </div>
             <div class="form-group">
                 <label asp-for="Rating" class="control-label"></label>
@@ -35,7 +42,7 @@
             </div>
             <div class="form-group">
                 <label asp-for="DateSubmitted" class="control-label"></label>
-                <input asp-for="DateSubmitted" class="form-control" />
+                <input asp-for="DateSubmitted" class="form-control" readonly/>
                 <span asp-validation-for="DateSubmitted" class="text-danger"></span>
             </div>
             <div class="form-group">

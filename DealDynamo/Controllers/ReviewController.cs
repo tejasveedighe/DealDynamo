@@ -75,34 +75,6 @@ namespace DealDynamo.Controllers
             return View(productReview);
         }
 
-        // GET: Review/Create
-        [Authorize(Roles = "Admin, Seller")]
-        public IActionResult Create()
-        {
-            ViewData["ProductID"] = new SelectList(_context.Product, "Id", "Id");
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id");
-            return View();
-        }
-
-        // POST: Review/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin, Seller")]
-        public async Task<IActionResult> Create([Bind("ID,ProductID,UserId,Rating,Comment,DateSubmitted")] ProductReview productReview)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Add(productReview);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["ProductID"] = new SelectList(_context.Product, "Id", "Id", productReview.ProductID);
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", productReview.UserId);
-            return View(productReview);
-        }
-
         // GET: Review/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
@@ -118,6 +90,9 @@ namespace DealDynamo.Controllers
             }
             ViewData["ProductID"] = new SelectList(_context.Product, "Id", "Id", productReview.ProductID);
             ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", productReview.UserId);
+
+            productReview.DateSubmitted = DateTime.Now;
+
             return View(productReview);
         }
 
@@ -155,7 +130,9 @@ namespace DealDynamo.Controllers
             }
             ViewData["ProductID"] = new SelectList(_context.Product, "Id", "Id", productReview.ProductID);
             ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", productReview.UserId);
-            return View(productReview);
+
+
+            return RedirectToAction(actionName: "Details", controllerName: "Home", routeValues: new { id = productReview.ProductID });
         }
 
         // GET: Review/Delete/5
@@ -222,7 +199,7 @@ namespace DealDynamo.Controllers
         public async Task<IActionResult> AddReview(ProductReview review)
         {
             await _productReviewRepository.AddReviewAsync(review);
-            return RedirectToAction(actionName: "Details", controllerName: "Home", routeValues: new {id=review.ProductID});
+            return RedirectToAction(actionName: "Details", controllerName: "Home", routeValues: new { id = review.ProductID });
         }
     }
 }

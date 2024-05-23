@@ -9,81 +9,69 @@
     bool IsSeller = User.IsInRole("Seller");
 }
 
-@if(IsAdmin || IsSeller)
+@if (IsAdmin || IsSeller)
 {
-    <aside class="col-auto d-flex flex-column flex-shrink-0 p-3 text-white bg-dark sidebar" style="width: 280px; height: 98vh">
+    <aside class="main-sidebar d-flex flex-column flex-shrink-0 p-3 text-white bg-dark sidebar" style="width: 280px; height: 100vh;">
         <a asp-area="" asp-controller="Home" asp-action="Index" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
             <svg class="bi me-2" width="40" height="32"><use xlink:href="#bootstrap"></use></svg>
-            <span class="fs-4">
-                   Deal Dynamo
-            </span>
+            <span class="fs-4">Deal Dynamo</span>
         </a>
         <hr>
         <ul class="nav nav-pills flex-column mb-auto">
             <li>
                 <a asp-area="" asp-controller="Home" asp-action="Index" class="nav-link text-white">
-                    <i class="fa-solid fa-gauge"></i>
-                    Dashboard
+                    <i class="fa-solid fa-gauge"></i> Dashboard
                 </a>
             </li>
             <li>
                 <a asp-area="" asp-controller="Orders" asp-action="Index" class="nav-link text-white">
-                    <i class="fa-solid fa-cart-shopping"></i>
-                    Orders
+                    <i class="fa-solid fa-cart-shopping"></i> Orders
                 </a>
             </li>
             <li>
                 <a asp-area="" asp-controller="Products" asp-action="Index" class="nav-link text-white">
-                    <i class="fa-solid fa-shop"></i>
-                    Products
+                    <i class="fa-solid fa-shop"></i> Products
                 </a>
             </li>
-                @if(IsAdmin)
-                {
-             <li>
-                <a asp-area="" asp-controller="Categories" asp-action="Index" class="nav-link text-white">
-                        <i class="fa-solid fa-list"></i>
-                    Categories
-                </a>
-            </li>
-
-                    <li>
-                        <a asp-area="" asp-controller="Users" asp-action="Index" class="nav-link text-white">
-                        <i class="fa-solid fa-user"></i>
-                            Users
-                        </a>
-                    </li>
-                 }
-             <li>
+            @if (IsAdmin)
+            {
+                <li>
+                    <a asp-area="" asp-controller="Categories" asp-action="Index" class="nav-link text-white">
+                        <i class="fa-solid fa-list"></i> Categories
+                    </a>
+                </li>
+                <li>
+                    <a asp-area="" asp-controller="Users" asp-action="Index" class="nav-link text-white">
+                        <i class="fa-solid fa-user"></i> Users
+                    </a>
+                </li>
+            }
+            <li>
                 <a asp-area="" asp-controller="Payments" asp-action="Index" class="nav-link text-white">
-                    <i class="fa-solid fa-file-invoice"></i>
-                    Payments
+                    <i class="fa-solid fa-file-invoice"></i> Payments
                 </a>
             </li>
-             <li>
+            <li>
                 <a asp-area="" asp-controller="Review" asp-action="Index" class="nav-link text-white">
-                    <i class="fa-solid fa-star"></i>
-                    Reviews
+                    <i class="fa-solid fa-star"></i> Reviews
                 </a>
             </li>
-
+        </ul>
+        <hr>
+        <div class="dropdown">
+            <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+                <img src="https://github.com/mdo.png" alt="" width="32" height="32" class="rounded-circle me-2">
+                <strong>@UserManager.GetUserName(User)</strong>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
+                <li><a class="dropdown-item" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Profile</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li class="nav-item">
+                    <form id="logoutForm" class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                        <button id="logout" type="submit" class="nav-link btn btn-link text-white">Logout</button>
+                    </form>
+                </li>
             </ul>
-            <hr>
-               <div class="dropdown">
-                <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
-                    <img src="https://github.com/mdo.png" alt="" width="32" height="32" class="rounded-circle me-2">
-                    <strong>@UserManager.GetUserName(User)</strong>
-                </a>
-                <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1" style="">
-                    <li><a class="dropdown-item" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Profile</a></li>
-                    <li><hr class="dropdown-divider"></li>
-                    <li class="nav-item">
-                        <form id="logoutForm" class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-                            <button id="logout" type="submit" class="nav-link btn btn-link text-white">Logout</button>
-                        </form>
-                    </li>
-                </ul>
-            </div>
+        </div>
     </aside>
 }
-

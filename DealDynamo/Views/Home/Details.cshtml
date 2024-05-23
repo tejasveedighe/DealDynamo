@@ -62,24 +62,6 @@
     </dl>
 </div>
 
-<hr/>
-<div>
-    @foreach(var review in Model.ProductReviews)
-    {
-        <div class="review">
-            <h5>Review by: @review.User?.UserName</h5>
-            <p>Rating: @review.Rating out of 5 stars</p>
-            <p>Comment: @review.Comment</p>
-            <p>Date Submitted: @review.DateSubmitted.ToString("g")</p>
-            @if(userId == review.User.Id)
-            {
-                <a asp-controller="Review" asp-action="Edit" asp-route-id="@Model.Id">Edit Review</a>
-            }
-        </div>
-        <hr />
-    }
-</div>
-
 <div>
     @if(Model.Quantity > 0)
     {
@@ -95,3 +77,22 @@
     }
     <a asp-action="Index">Back to List</a>
 </div>
+<hr/>
+<div>
+    @foreach(var review in Model.ProductReviews)
+    {
+        <div class="review">
+            <h5>Review by: @review.User?.UserName</h5>
+            <p>Rating: @review.Rating out of 5 stars</p>
+            <p>Comment: @review.Comment</p>
+            <p>Date Submitted: @review.DateSubmitted.ToString("g")</p>
+            @if(userId == review.User.Id)
+            {
+                <a asp-controller="Review" asp-action="Edit" asp-route-id="@Model.Id">Edit Review</a>
+                <a asp-controller="Review" asp-action="Delete" asp-route-id="@Model.Id">Delete Review</a>
+            }
+        </div>
+        <hr />
+    }
+</div>
+
