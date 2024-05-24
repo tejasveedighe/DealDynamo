@@ -24,5 +24,6 @@ namespace DealDynamo.Models
         public Payments Payment { get; set; }
         public ApplicationUser Buyer { get; set; }
         public Address Address { get; set; }
+        DealDynamo
     }
 }

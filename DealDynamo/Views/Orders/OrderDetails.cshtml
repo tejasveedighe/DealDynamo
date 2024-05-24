@@ -80,11 +80,11 @@
                         <td class="d-flex align-items-start gap-3">
                             <img src="~/images/@item.Product.ProductImage" alt="@item.Product.Title" width="100" height="100" />
                             <span>
-                                <h5>@item.Product.Title</h5>
+                                <h5>@item?.Product?.Title</h5>
                                 <ul>
                                     <li>Quantity: @item.Quantity</li>
-                                    <li>Price: &#8377;@item.Product.Price</li>
-                                    <li>Sub-Total Price: &#8377;@(item.Product.Price * item.Quantity)</li>
+                                    <li>Price: &#8377;@item?.Product?.Price</li>
+                                    <li>Sub-Total Price: &#8377;@(item?.Product?.Price * item.Quantity)</li>
                                 </ul>
                             </span>
                         </td>
