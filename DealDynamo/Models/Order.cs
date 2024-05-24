@@ -1,5 +1,6 @@
 ﻿using DealDynamo.Areas.Identity.Data;
 using DealDynamo.Models.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace DealDynamo.Models
 {
@@ -7,11 +8,15 @@ namespace DealDynamo.Models
     {
         public int Id { get; set; }
         public string BuyerId { get; set; }
+        [Display(Name = "Total Price")]
         public decimal TotalPrice { get; set; }
         public int? PaymentId { get; set; }
+        [Display(Name = "Order Status")]
         public OrderStatusEnum OrderStatus { get; set; }
         public int AddressId { get; set; }
+        [Display(Name = "Order Date")]
         public DateTime? OrderDate { get; set; }
+        [Display(Name = "Delivery Date")]
         public DateTime? ShippingDate { get; set; }
 
         // Navigation properties
