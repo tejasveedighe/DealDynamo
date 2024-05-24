@@ -30,8 +30,8 @@ namespace DealDynamo.Models.OrderViewModels
                 },
                 new SelectListItem()
                 {
-                    Text = OrderStatusEnum.Compelete.ToString(),
-                    Value = Convert.ToString(OrderStatusEnum.Compelete)
+                    Text = OrderStatusEnum.Complete.ToString(),
+                    Value = Convert.ToString(OrderStatusEnum.Complete)
                 }
             };
 

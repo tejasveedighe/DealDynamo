@@ -2,6 +2,6 @@
 {
     public enum OrderStatusEnum
     {
-        Pending, Dispatched, Cancelled, Compelete
+        Pending, Dispatched, Cancelled, Complete
     }
 }

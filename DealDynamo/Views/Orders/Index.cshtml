@@ -1,65 +1,165 @@
 ﻿@model DealDynamo.Models.OrderViewModels.OrderListViewModel
 
+@using DealDynamo.Models.Enums
+
 @{
     ViewData["Title"] = "Orders";
 }
 
-<h1>Orders</h1>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Order List</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        .sortable:hover {
+            cursor: pointer;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <h1>Orders</h1>
 
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>Order ID</th>
-            <th>Buyer</th>
-            <th>Total Price</th>
-            <th>Order Date</th>
-            <th>Order Status</th>
-            <th>Payment Status</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var order in Model.Orders)
-        {
+    <div>
+        <label for="orderStatusFilter">Filter by Order Status:</label>
+        <select id="orderStatusFilter">
+            <option value="All">All</option>
+            @foreach (var status in Enum.GetValues(typeof(OrderStatusEnum)))
+            {
+                <option value="@status">@status</option>
+            }
+        </select>
+
+        <label for="paymentStatusFilter">Filter by Payment Status:</label>
+        <select id="paymentStatusFilter">
+            <option value="All">All</option>
+            @foreach (var status in Enum.GetValues(typeof(PaymentStatusEnum)))
+            {
+                <option value="@status">@status</option>
+            }
+        </select>
+
+        <label for="sortOrderDate">Sort by Order Date:</label>
+        <select id="sortOrderDate">
+            <option value="asc">Ascending</option>
+            <option value="desc">Descending</option>
+        </select>
+    </div>
+
+    <table class="table table-bordered">
+        <thead>
             <tr>
-                <td>@order.Id</td>
-                @if (order?.Buyer?.UserName != null) { <td>@order?.Buyer?.UserName</td> } else {
-                    <td></td>
-                }
-                <td>@order.TotalPrice.ToString("C")</td>
-                <td>@order.OrderDate?.ToString("g")</td>
-                <td>@order.OrderStatus</td>
-                <td>@order?.Payment?.Status</td>
-                <td>
-                    <a href="@Url.Action("Details", "Orders", new { id = order.Id })" class="btn btn-info">View</a>
-                    <a href="@Url.Action("Delete", "Orders", new { id = order.Id })" class="btn btn-danger">Delete</a>
-                </td>
+                <th>Order ID</th>
+                <th>Buyer</th>
+                <th>Total Price</th>
+                <th class="sortable" data-sort="asc" id="orderDateHeader">Order Date</th>
+                <th>Order Status</th>
+                <th>Payment Status</th>
+                <th>Actions</th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody id="orderTableBody">
+            @foreach (var order in Model.Orders)
+            {
+                <tr>
+                    <td>@order.Id</td>
+                    @if (order?.Buyer?.UserName != null)
+                    {
+                        <td>@order?.Buyer?.UserName</td>
+                    }
+                    else
+                    {
+                        <td></td>
+                    }
+                    <td>₹@order.TotalPrice</td>
+                    <td data-order-date="@order.OrderDate?.ToString("yyyy-MM-dd")">@order.OrderDate?.ToString("dd-MM-yyyy")</td>
+                    <td>@order.OrderStatus</td>
+                    <td>@order?.Payment?.Status</td>
+                    <td>
+                        <a href="@Url.Action("Details", "Orders", new { id = order.Id })" class="btn btn-info">View</a>
+                        <a href="@Url.Action("Delete", "Orders", new { id = order.Id })" class="btn btn-danger">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
 
-<nav aria-label="Page navigation">
-    <ul class="pagination">
-        <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
-            <a class="page-link" href="@Url.Action("Index", new { currentPage = 1, pageSize = Model.PageSize })">First</a>
-        </li>
-        <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
-            <a class="page-link" href="@Url.Action("Index", new { currentPage = Model.CurrentPage - 1, pageSize = Model.PageSize })">Previous</a>
-        </li>
-
-        @for (int i = 1; i <= Model.TotalPages; i++)
-        {
-            <li class="page-item @(Model.CurrentPage == i ? "active" : "")">
-                <a class="page-link" href="@Url.Action("Index", new { currentPage = i, pageSize = Model.PageSize })">@i</a>
+    <nav aria-label="Page navigation">
+        <ul class="pagination">
+            <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
+                <a class="page-link" href="@Url.Action("Index", new { currentPage = 1, pageSize = Model.PageSize })">First</a>
             </li>
-        }
+            <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
+                <a class="page-link" href="@Url.Action("Index", new { currentPage = Model.CurrentPage - 1, pageSize = Model.PageSize })">Previous</a>
+            </li>
 
-        <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
-            <a class="page-link" href="@Url.Action("Index", new { currentPage = Model.CurrentPage + 1, pageSize = Model.PageSize })">Next</a>
-        </li>
-        <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
-            <a class="page-link" href="@Url.Action("Index", new { currentPage = Model.TotalPages, pageSize = Model.PageSize })">Last</a>
-        </li>
-    </ul>
-</nav>
+            @for (int i = 1; i <= Model.TotalPages; i++)
+            {
+                <li class="page-item @(Model.CurrentPage == i ? "active" : "")">
+                    <a class="page-link" href="@Url.Action("Index", new { currentPage = i, pageSize = Model.PageSize })">@i</a>
+                </li>
+            }
+
+            <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
+                <a class="page-link" href="@Url.Action("Index", new { currentPage = Model.CurrentPage + 1, pageSize = Model.PageSize })">Next</a>
+            </li>
+            <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
+                <a class="page-link" href="@Url.Action("Index", new { currentPage = Model.TotalPages, pageSize = Model.PageSize })">Last</a>
+            </li>
+        </ul>
+    </nav>
+
+    <script>
+        $(document).ready(function () {
+            $('#orderStatusFilter').change(function () {
+                filterOrders();
+            });
+
+            $('#paymentStatusFilter').change(function () {
+                filterOrders();
+            });
+
+            $('#sortOrderDate').change(function () {
+                var sortOrder = $(this).val();
+                sortOrdersByDate(sortOrder);
+            });
+
+            function filterOrders() {
+                var selectedOrderStatus = $('#orderStatusFilter').val();
+                var selectedPaymentStatus = $('#paymentStatusFilter').val();
+
+                $('#orderTableBody tr').each(function () {
+                    var orderStatus = $(this).find('td:eq(4)').text();
+                    var paymentStatus = $(this).find('td:eq(5)').text();
+
+                    var statusMatch = (selectedOrderStatus === "All" || orderStatus === selectedOrderStatus);
+                    var paymentMatch = (selectedPaymentStatus === "All" || paymentStatus === selectedPaymentStatus);
+
+                    if (statusMatch && paymentMatch) {
+                        $(this).show();
+                    } else {
+                        $(this).hide();
+                    }
+                });
+            }
+
+            function sortOrdersByDate(order) {
+                var rows = $('#orderTableBody tr').get();
+                rows.sort(function (a, b) {
+                    var dateA = $(a).find('td[data-order-date]').data('order-date');
+                    var dateB = $(b).find('td[data-order-date]').data('order-date');
+                    if (order === 'asc') {
+                        return (new Date(dateA) > new Date(dateB)) ? 1 : -1;
+                    } else {
+                        return (new Date(dateA) < new Date(dateB)) ? 1 : -1;
+                    }
+                });
+                $.each(rows, function (index, row) {
+                    $('#orderTableBody').append(row);
+                });
+            }
+        });
+    </script>
+</body>
+</html>
