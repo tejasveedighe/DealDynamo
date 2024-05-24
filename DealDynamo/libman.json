@@ -18,9 +18,5 @@
       "library": "admin-lte@3.2.0",
       "destination": "wwwroot/admin-lte/"
     },
-    {
-      "library": "rateYo@2.3.4",
-      "destination": "wwwroot/lib/rateYo/"
-    }
   ]
 }

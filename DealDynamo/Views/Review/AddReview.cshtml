@@ -4,50 +4,62 @@
     ViewData["Title"] = "Add Review";
 }
 
-<h1>Add Review</h1>
+<div class="container">
+    <h1>Add Review</h1>
+    <hr />
+    <div class="row">
+        <div class="d-flex align-items-start gap-3">
+            <form class="col-md-4" asp-action="AddReview" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <h6>Add Your Review: </h6>
+                <div class="form-group">
+                    <label asp-for="ProductID" class="control-label" hidden></label>
+                    <input asp-for="ProductID" class ="form-control" hidden></input>
 
-<h4>Product Review</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="AddReview" method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="ProductID" class="control-label" hidden></label>
-                <input asp-for="ProductID" class ="form-control" hidden></input>
+                    <label class="control-label" hidden>Product Title</label>
+                    <input class="form-control" value="@Model.Product?.Title" readonly hidden></input>
+                </div>
+                <div class="form-group">
+                    <label asp-for="UserId" class="control-label" hidden></label>
+                    <input asp-for="UserId" class ="form-control" hidden></input>
 
-                <label class="control-label" readonly>Product Title</label>
-                <input class="form-control" value="@Model.Product?.Title" readonly></input>
+                    <label for="User Name" class="control-label" hidden>User Name</label>
+                    <input class="form-control" hidden value="@Model.User?.UserName"></input>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Rating" class="control-label">Rating Out of 5</label>
+                    <input type="number" asp-for="Rating" class="form-control" />
+                    <span asp-validation-for="Rating" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Comment" class="control-label"></label>
+                    <textarea rows="5" asp-for="Comment" class="form-control"></textarea>
+                    <span asp-validation-for="Comment" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="DateSubmitted" class="control-label" hidden></label>
+                    <input asp-for="DateSubmitted" class="form-control" hidden/>
+                    <span asp-validation-for="DateSubmitted" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <button type="submit" value="Create" class="btn btn-primary mt-3">Add Review</button>
+                </div>
+            </form>
+            <div class="vr"> </div>
+            <div class="d-flex flex-column">
+                <label class="control-label">Product Information</label>
+                <div class="d-flex align-items-start gap-5">
+                    <img src="~/images/@Model.Product.ProductImage" width="400" height="500"/>
+                    <div>
+                        <h6>@Model?.Product?.Title</h6>
+                        <div>@Model?.Product?.Description .</div>
+                        <div>₹@Model?.Product?.Price</div>
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="UserId" class="control-label" hidden></label>
-                <input asp-for="UserId" class ="form-control" hidden></input>
-
-                <label for="User Name" class="control-label" >User Name</label>
-                <input class="form-control" readonly value="@Model.User?.UserName"></input>
-            </div>
-            <div class="form-group">
-                <label asp-for="Rating" class="control-label"></label>
-                <input asp-for="Rating" class="form-control" />
-                <span asp-validation-for="Rating" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Comment" class="control-label"></label>
-                <input asp-for="Comment" class="form-control" />
-                <span asp-validation-for="Comment" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="DateSubmitted" class="control-label"></label>
-                <input asp-for="DateSubmitted" class="form-control" readonly/>
-                <span asp-validation-for="DateSubmitted" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <button type="submit" value="Create" class="btn btn-primary mt-3">Add Review</button>
-            </div>
-        </form>
+        </div>
     </div>
 </div>
-
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");

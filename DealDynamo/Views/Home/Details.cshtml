@@ -45,10 +45,10 @@
                     @Model.Title
                 </h5>
                 <p>
-                    Sold By: @user.UserName
+                    Sold By: @user?.UserName
                 </p>
                 <p class="w-50 overflow-hidden" style="max-height: 400px; overflow: scroll;">
-                    @Model.Description
+                    Description: @Model.Description
                 </p>
                 <h3>
                     ₹@Model.Price
@@ -63,7 +63,7 @@
                         @foreach (var review in Model.ProductReviews)
                         {
                             <div class="review p-3 mb-2 bg-light rounded">
-                                <p><strong>@review.User.UserName</strong> <span class="text-muted">(@review.DateSubmitted.ToString("dd/MM/yyyy"))</span></p>
+                                <p><strong>@review?.User?.UserName</strong> <span class="text-muted">(@review.DateSubmitted.ToString("dd/MM/yyyy"))</span></p>
                                 <p>@review.Comment</p>
                                 <p><strong>Rating:</strong></p>
                                 <div>
