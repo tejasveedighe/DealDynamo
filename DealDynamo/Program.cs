@@ -19,7 +19,9 @@ builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
     .AddEntityFrameworkStores<DealDynamoContext>();
 
 // Add services to the container.
-builder.Services.AddControllersWithViews();
+builder
+    .Services
+    .AddControllersWithViews();
 
 builder.Services.AddMvc();
 builder.Services.AddRazorPages();

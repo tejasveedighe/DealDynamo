@@ -59,3 +59,18 @@ body {
 .with-sidebar {
     margin-left: 280px; /* Match the width of the sidebar */
 }
+
+/* Cart */
+
+.cart-container {
+    width: 1000px;
+}
+
+.cart {
+    width: 100%;
+    border-radius: 10px;
+    border: none;
+    background: white;
+    align-self: center;
+    text-align: center;
+}
