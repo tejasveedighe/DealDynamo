@@ -21,30 +21,37 @@
 <body>
     <h1>Orders</h1>
 
-    <div>
-        <label for="orderStatusFilter">Filter by Order Status:</label>
-        <select id="orderStatusFilter">
-            <option value="All">All</option>
-            @foreach (var status in Enum.GetValues(typeof(OrderStatusEnum)))
-            {
-                <option value="@status">@status</option>
-            }
-        </select>
+    <div class="d-flex align-items-center justify-content-evenly">
+        <div class="form-group">
+            <label for="orderStatusFilter">Filter by Order Status:</label>
+            <select id="orderStatusFilter">
+                <option value="All">All</option>
+                @foreach (var status in Enum.GetValues(typeof(OrderStatusEnum)))
+                {
+                    <option value="@status">@status</option>
+                }
+            </select>
+        </div>
 
-        <label for="paymentStatusFilter">Filter by Payment Status:</label>
-        <select id="paymentStatusFilter">
-            <option value="All">All</option>
-            @foreach (var status in Enum.GetValues(typeof(PaymentStatusEnum)))
-            {
-                <option value="@status">@status</option>
-            }
-        </select>
+        <div class="form-group">
 
-        <label for="sortOrderDate">Sort by Order Date:</label>
-        <select id="sortOrderDate">
-            <option value="asc">Ascending</option>
-            <option value="desc">Descending</option>
-        </select>
+            <label for="paymentStatusFilter">Filter by Payment Status:</label>
+            <select id="paymentStatusFilter">
+                <option value="All">All</option>
+                @foreach (var status in Enum.GetValues(typeof(PaymentStatusEnum)))
+                {
+                    <option value="@status">@status</option>
+                }
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="sortOrderDate">Sort by Order Date:</label>
+            <select id="sortOrderDate">
+                <option value="asc">Ascending</option>
+                <option value="desc">Descending</option>
+            </select>
+        </div>
     </div>
 
     <table class="table table-bordered">
