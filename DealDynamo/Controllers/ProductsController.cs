@@ -31,7 +31,7 @@ namespace DealDynamo.Controllers
         }
         // GET: ProductController
         [HttpGet]
-        public async Task<ActionResult> Index(int currentPage = 1, int pageSize = 5, int? categoryFilter = null, string sortOrder = "asc")
+        public async Task<ActionResult> Index(int currentPage = 1, int pageSize = 10, int? categoryFilter = null, string sortOrder = "title_asc")
         {
             IEnumerable<Product> products = _productRepository.GetAllProducts();
 
@@ -59,6 +59,12 @@ namespace DealDynamo.Controllers
                     break;
                 case "price_desc":
                     products = products.OrderByDescending(p => p.Price);
+                    break;
+                case "quantity_asc":
+                    products = products.OrderBy(p => p.Quantity);
+                    break;
+                case "quantity_desc":
+                    products = products.OrderByDescending(p => p.Quantity);
                     break;
                 default:
                     products = products.OrderBy(p => p.Title);

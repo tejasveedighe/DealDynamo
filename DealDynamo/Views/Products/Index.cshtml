@@ -23,22 +23,24 @@
 <div class="d-flex align-items-center justify-content-evenly">
     <div class="form-group">
         <label for="categoryFilter">Filter by Category:</label>
-        <select id="categoryFilter" class="form-select">
+        <select id="categoryFilter" class="form-control">
             <option value="">All</option>
             @foreach (var category in _categoryRepository.GetAllCategories())
             {
-                <option value="@category.Id" selected=@(ViewBag.CategoryFilter != null && ViewBag.CategoryFilter == category.Id)>@category.Title</option>
+                <option value="@category.Id" selected=@(ViewBag.CategoryFilter != null && ViewBag.CategoryFilter.ToString() == category.Id.ToString())>@category.Title</option>
             }
         </select>
     </div>
 
     <div class="form-group">
         <label for="sortOrder">Sort by:</label>
-        <select id="sortOrder" class="form-select">
-            <option value="title_asc" selected=@(ViewBag.SortOrder == "title_asc")>Title (A-Z)</option>
-            <option value="title_desc" selected=@(ViewBag.SortOrder == "title_desc")>Title (Z-A)</option>
+        <select id="sortOrder" class="form-control">
+            <option value="title_asc" selected=@(ViewBag.SortOrder == "title_asc" )>Title (A-Z)</option>
+            <option value="title_desc" selected=@(ViewBag.SortOrder == "title_desc" )>Title (Z-A)</option>
             <option value="price_asc" selected=@(ViewBag.SortOrder == "price_asc" )>Price (Low to High)</option>
-            <option value="price_desc" selected=@(ViewBag.SortOrder == "price_desc")>Price (High to Low)</option>
+            <option value="price_desc" selected=@(ViewBag.SortOrder == "price_desc" )>Price (High to Low)</option>
+            <option value="quantity_asc" selected=@(ViewBag.SortOrder == "quantity_asc" )>Quantity (Low to High)</option>
+            <option value="quantity_desc" selected=@(ViewBag.SortOrder == "quantity_desc" )>Quantity (High to Low)</option>
         </select>
     </div>
 </div>
@@ -47,6 +49,7 @@
     <thead>
         <tr>
             <th>@Html.DisplayNameFor(model => model.Products.FirstOrDefault().Title)</th>
+            <th>@Html.DisplayNameFor(model => model.Products.FirstOrDefault().Quantity)</th>
             <th>@Html.DisplayNameFor(model => model.Products.FirstOrDefault().ProductImage)</th>
             <th>Category</th>
             <th>Seller</th>
@@ -59,7 +62,8 @@
         {
             <tr>
                 <td>@Html.DisplayFor(modelItem => item.Title)</td>
-                <td><img src="~/images/@item.ProductImage" width="200" height="200"/></td>
+                <td>@Html.DisplayFor(modelItem => item.Quantity)</td>
+                <td><img src="~/images/@item.ProductImage" width="200" height="200" /></td>
                 <td>@_categoryRepository.GetCategoryById(item.CategoryID)?.Title</td>
                 <td>@UserManager.FindByIdAsync(Convert.ToString(item.SellerID)).GetAwaiter().GetResult().UserName</td>
                 <td>@Html.DisplayFor(modelItem => item.Price)</td>
@@ -67,9 +71,9 @@
                     <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info">Details</a> |
                     @if (IsSeller)
                     {
-                        @Html.ActionLink("Edit", "Edit", "Products", new { id = item.Id }, new{@class = "btn btn-primary"})
+                        @Html.ActionLink("Edit", "Edit", "Products", new { id = item.Id }, new{@class="btn btn-primary"}) <text>|</text>
                     }
-                    @Html.ActionLink("Delete", "Delete", "Products", new { id = item.Id }, new {@class = "btn btn-danger"})
+                    @Html.ActionLink("Delete", "Delete", "Products", new { id = item.Id }, new{@class="btn btn-danger"})
                 </td>
             </tr>
         }
@@ -111,7 +115,7 @@
             var queryString = $.param({
                 categoryFilter: categoryFilter,
                 sortOrder: sortOrder,
-                currentPage: 1,
+                currentPage: 1, // Reset to the first page on filter change
                 pageSize: @Model.PageSize
             });
 
