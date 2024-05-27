@@ -192,7 +192,8 @@ namespace DealDynamo.Controllers
         }
 
         // GET: OrdersController/Delete/5
-        public ActionResult Delete(int id)
+        [HttpGet]
+        public IActionResult Delete(int id)
         {
             var order = _orderRepository.GetOrderById(id);
             return View(order);
@@ -201,7 +202,7 @@ namespace DealDynamo.Controllers
         // POST: OrdersController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public IActionResult Delete(int id, IFormCollection collection)
         {
             try
             {

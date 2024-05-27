@@ -17,7 +17,7 @@
 <div class="d-flex align-items-center justify-content-evenly">
     <div class="form-group">
         <label for="orderStatusFilter">Filter by Order Status:</label>
-        <select id="orderStatusFilter" class="form-control">
+        <select id="orderStatusFilter" class="form-select">
             <option selected=@(ViewBag.OrderStatusFilter == "All") value="All">All</option>
             @foreach (var status in Enum.GetValues(typeof(OrderStatusEnum)).Cast<OrderStatusEnum>())
             {
@@ -28,7 +28,7 @@
 
     <div class="form-group">
         <label for="paymentStatusFilter">Filter by Payment Status:</label>
-        <select id="paymentStatusFilter" class="form-control">
+        <select id="paymentStatusFilter" class="form-select">
             <option value="All">All</option>
             @foreach (var status in Enum.GetValues(typeof(PaymentStatusEnum)))
             {
@@ -39,7 +39,7 @@
 
     <div class="form-group">
         <label for="sortOrderDate">Sort by Order Date:</label>
-        <select id="sortOrderDate" class="form-control">
+        <select id="sortOrderDate" class="form-select">
             <option value="asc" selected=@(ViewBag.SortOrderDate == "asc" )>Ascending</option>
             <option value="desc" selected=@(ViewBag.SortOrderDate == "desc")>Descending</option>
         </select>

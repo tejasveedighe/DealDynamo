@@ -4,60 +4,142 @@
     ViewData["Title"] = "Delete";
 }
 
-<h1>Delete</h1>
 
-<h3>Are you sure you want to delete this?</h3>
-<div>
-    <h4>Order</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.TotalPrice)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.TotalPrice)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.PaymentId)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.PaymentId)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.OrderStatus)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.OrderStatus)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.OrderDate)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.OrderDate)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ShippingDate)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ShippingDate)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Buyer)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Buyer.UserName ?? string.Empty)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Address)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Address.Id)
-        </dd>
-    </dl>
-    
-    <form asp-action="Delete">
-        <input type="hidden" asp-for="Id" />
-        <input type="submit" value="Delete" class="btn btn-danger" /> |
-        <a asp-action="Index">Back to List</a>
-    </form>
+<div class="container">
+    <div class="d-flex align-items-start gap-4">
+        <div class="col-6">
+            <h4>View Order Details</h4>
+            <div class="rounded border p-2">
+                <div class="d-flex align-items-center justify-content-between">
+                    <span>Order Date</span>
+                    <span>@Model?.OrderDate?.ToString("dd-MM-yyyy")</span>
+                </div>
+                <div class="d-flex align-items-center justify-content-between">
+                    <span>Order Number</span>
+                    <span>@Model?.Id</span>
+                </div>
+                <div class="d-flex align-items-center justify-content-between">
+                    <span>Order Total</span>
+                    <span>@Model?.TotalPrice<span>
+                </div>
+            </div>
+            <br/>
+            <h4>Shipping Details</h4>
+            <div class="rounded border p-2">
+                <div class="d-flex align-items-center justify-content-between">
+                    <span>Shipping Date</span>
+                    <span>@if (Model?.ShippingDate != null) {
+                            @Html.ValueFor(model => model.ShippingDate)
+                        } else
+                        {
+                            <text>Will be Updated Soon.</text>
+                        }
+                    </span>
+                </div>
+                <div class="d-flex align-items-center justify-content-between">
+                    <span>Shipping Address</span>
+                    <span>@Model?.Address?.HouseNumber @Model?.Address?.Street @Model?.Address?.City, @Model?.Address?.Country</span>
+                </div>
+                <div class="d-flex align-items-center justify-content-between">
+                    <span>Shipping Status</span>
+                    <span>@Model?.OrderStatus<span>
+                </div>
+            </div>
+            <br/>
+            <h4>Payment Details</h4>
+            <div class="rounded border p-2">
+                <div class="d-flex align-items-center justify-content-between">
+                    <span>Payment Date</span>
+                    <span>@if (Model?.Payment?.PaymentDate != null) 
+                        {
+                            @Model?.Payment?.PaymentDate?.ToString("dd-MM-yyyy")
+                        } else
+                        {
+                            <text>Will be Updated Soon.</text>
+                        }
+                    </span>
+                </div>
+                <div class="d-flex align-items-center justify-content-between">
+                    <span>Billing Address</span>
+                    <span>@Model?.Address?.HouseNumber @Model?.Address?.Street @Model?.Address?.City, @Model?.Address?.Country</span>
+                </div>
+                <div class="d-flex align-items-center justify-content-between">
+                    <span>Payment Status</span>
+                    <span>@Model?.Payment?.Status<span>
+                </div>
+            </div>
+        </div>
+        <table class="table table-bordered table-striped">
+            <thead>
+                <th class="position-sticky top-0">Order Items</th>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.OrderItems)
+                {
+                    <tr>
+                        <td class="d-flex align-items-start gap-3">
+                            <img src="~/images/@item.Product.ProductImage" alt="@item.Product.Title" width="100" height="100" />
+                            <span>
+                                <h5>@item?.Product?.Title</h5>
+                                <ul>
+                                    <li>Quantity: @item.Quantity</li>
+                                    <li>Price: &#8377;@item?.Product?.Price</li>
+                                    <li>Sub-Total Price: &#8377;@(item?.Product?.Price * item.Quantity)</li>
+                                </ul>
+                            </span>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="mt-4">
+        <form asp-action="Delete">
+            <input type="hidden" asp-for="Id" />
+            <button id="deleteBtn" value="Delete" class="btn btn-danger" /> |
+            <a asp-action="Index">Back to List</a>
+        </form>
+    </div>
 </div>
+
+@section Scripts {
+    <script>
+        $("#deleteBtn").click(function (event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            const swalWithBootstrapButtons = Swal.mixin({
+                customClass: {
+                    confirmButton: "btn btn-success",
+                    cancelButton: "btn btn-danger"
+                },
+                buttonsStyling: false
+            });
+
+            swalWithBootstrapButtons.fire({
+                title: "Are you sure?",
+                text: "You won't be able to revert this!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Yes, delete it!",
+                cancelButtonText: "No, cancel!",
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $("form").submit().then(function(){
+                        swalWithBootstrapButtons.fire({
+                            title: "Deleted!",
+                            text: "Your file has been deleted.",
+                            icon: "success"
+                        });
+                    });
+                } else if (result.dismiss === Swal.DismissReason.cancel) {
+                    swalWithBootstrapButtons.fire({
+                        title: "Cancelled",
+                        text: "Your order is safe :)",
+                        icon: "error"
+                    });
+                }
+            });
+        });
+    </script>
+}
