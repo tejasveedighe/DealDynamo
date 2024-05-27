@@ -1,58 +1,45 @@
 ﻿@model DealDynamo.Models.ProductReview
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Edit Review";
 }
 
-<h1>Edit</h1>
-
-<h4>ProductReview</h4>
-<hr />
 <div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="ID" />
-            <div class="form-group">
-                <label asp-for="ProductID" class="control-label" hidden></label>
-                <select asp-for="ProductID" class="form-control" hidden asp-items="ViewBag.ProductID"></select>
-                <span asp-validation-for="ProductID" class="text-danger"></span>
-
-
-                <label class="control-label">Product Title</label>
-                <input class="form-control" readonly value="@Model.Product?.Title"></input>
+    <div class="col-md-6">
+        <div class="card card-warning">
+            <div class="card-header">
+                <h3 class="card-title">Review Update</h3>
             </div>
-            <div class="form-group">
-                <label asp-for="UserId" class="control-label" hidden></label>
-                <select asp-for="UserId" class="form-control" hidden asp-items="ViewBag.UserId"></select>
-                <span asp-validation-for="UserId" class="text-danger"></span>
-
-                <label class="control-label">User Name</label>
-                <input class="form-control" readonly value="@Model.User?.UserName"></input>
+            <div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label>@Html.DisplayNameFor(model => model.Rating)</label>
+                        <input class="form-control" value="@Model.Rating">
+                    </div>
+                    <div class="form-group">
+                        <label>@Html.DisplayNameFor(model => model.Comment)</label>
+                        <textarea class="form-control">@Model.Comment</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>@Html.DisplayNameFor(model => model.DateSubmitted)</label>
+                        <input class="form-control" value="@Model.DateSubmitted.ToString("yyyy-MM-dd")">
+                    </div>
+                    <div class="form-group">
+                        <label>@Html.DisplayNameFor(model => model.Product.Title)</label>
+                        <input class="form-control" value="@Model.Product.Title">
+                    </div>
+                    <div class="form-group">
+                        <label>@Html.DisplayNameFor(model => model.User.UserName)</label>
+                        <input class="form-control" value="@Model.User.UserName">
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a class="btn btn-primary" asp-action="Index">Back to List</a>
+                    <a class="btn btn-danger" asp-action="Delete" asp-route-id="@Model.ID">Delete</a>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="Rating" class="control-label"></label>
-                <input asp-for="Rating" class="form-control" />
-                <span asp-validation-for="Rating" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Comment" class="control-label"></label>
-                <input asp-for="Comment" class="form-control" />
-                <span asp-validation-for="Comment" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="DateSubmitted" class="control-label"></label>
-                <input asp-for="DateSubmitted" class="form-control" readonly/>
-                <span asp-validation-for="DateSubmitted" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
 

@@ -1,47 +1,53 @@
 ﻿@model DealDynamo.Models.ProductReview
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Review Details";
 }
 
-<h1>Details</h1>
-
-<div>
-    <h4>ProductReview</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Rating)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Rating)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Comment)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Comment)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.DateSubmitted)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.DateSubmitted)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Product)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Product.Id)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.User)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.User.Id)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Index">Back to List</a>
+<div class="row">
+    <div class="col-md-6">
+        <div class="card card-info">
+            <div class="card-header">
+                <h3 class="card-title">Review Detail</h3>
+            </div>
+            <div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label>@Html.DisplayNameFor(model => model.Rating)</label>
+                        @for (int i = 0; i < 5; i++)
+                        {
+                            if (i < Model.Rating)
+                            {
+                                <i class="fa-solid fa-star" style="color: gold;"></i>
+                            }
+                            else
+                            {
+                                <i class="fa-solid fa-star"></i>
+                            }
+                        }
+                    </div>
+                    <div class="form-group">
+                        <label>@Html.DisplayNameFor(model => model.Comment)</label>
+                        <textarea readonly class="form-control">@Model.Comment</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>@Html.DisplayNameFor(model => model.DateSubmitted)</label>
+                        <input readonly class="form-control" value="@Model.DateSubmitted.ToString("yyyy-MM-dd")">
+                    </div>
+                    <div class="form-group">
+                        <label>@Html.DisplayNameFor(model => model.Product.Title)</label>
+                        <input readonly class="form-control" value="@Model.Product.Title">
+                    </div>
+                    <div class="form-group">
+                        <label>@Html.DisplayNameFor(model => model.User.UserName)</label>
+                        <input readonly class="form-control" value="@Model.User.UserName">
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a class="btn btn-primary" asp-action="Index">Back to List</a>
+                    <a class="btn btn-danger" asp-action="Delete" asp-route-id="@Model.ID">Delete</a>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

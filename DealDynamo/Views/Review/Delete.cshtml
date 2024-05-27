@@ -4,48 +4,46 @@
     ViewData["Title"] = "Delete";
 }
 
-<h1>Delete</h1>
-
-<h3>Are you sure you want to delete this?</h3>
-<div>
-    <h4>ProductReview</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Rating)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Rating)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Comment)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Comment)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.DateSubmitted)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.DateSubmitted)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Product)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Product.Id)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.User)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.User.Id)
-        </dd>
-    </dl>
-    
-    <form asp-action="Delete">
-        <input type="hidden" asp-for="ID" />
-        <input type="submit" value="Delete" class="btn btn-danger" /> |
-        <a asp-action="Index">Back to List</a>
-    </form>
+<div class="row">
+    <div class="col-md-6">
+        <div class="card card-danger">
+            <div class="card-header">
+                <h3 class="card-title">Review Delete</h3>
+            </div>
+            <div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label>@Html.DisplayNameFor(model => model.Rating)</label>
+                        <input readonly class="form-control" value="@Model.Rating">
+                    </div>
+                    <div class="form-group">
+                        <label>@Html.DisplayNameFor(model => model.Comment)</label>
+                        <textarea readonly class="form-control">@Model.Comment</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>@Html.DisplayNameFor(model => model.DateSubmitted)</label>
+                        <input readonly class="form-control" value="@Model.DateSubmitted.ToString("yyyy-MM-dd")">
+                    </div>
+                    <div class="form-group">
+                        <label>@Html.DisplayNameFor(model => model.Product.Title)</label>
+                        <input readonly class="form-control" value="@Model.Product.Title">
+                    </div>
+                    <div class="form-group">
+                        <label>@Html.DisplayNameFor(model => model.User.UserName)</label>
+                        <input readonly  class="form-control" value="@Model.User.UserName">
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <form asp-action="Delete">
+                        <input type="hidden" asp-for="ID" />
+                        <input type="submit" value="Delete" class="btn btn-danger" /> |
+                        <a asp-action="Index">Back to List</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+
+
