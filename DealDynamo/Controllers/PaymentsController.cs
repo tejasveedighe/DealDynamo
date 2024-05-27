@@ -1,4 +1,5 @@
-﻿using DealDynamo.Models.PaymentViewModels;
+﻿using DealDynamo.Models.Enums;
+using DealDynamo.Models.PaymentViewModels;
 using DealDynamo.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -16,21 +17,33 @@ namespace DealDynamo.Controllers
         }
 
         // GET: PaymentsController
-        public ActionResult Index(int currentPage = 1, int pageSize = 10)
+        [HttpGet]
+        public IActionResult Index(int currentPage = 1, int pageSize = 10, string paymentStatusFilter = "", string sortPaymentDate = "")
         {
             var payments = _paymentsRepository.GetAllPayments();
-            var totalPayments = payments.Count();
-            var totalPages = (int)Math.Ceiling((double)totalPayments / 10);
 
-            var paginatedOrders = payments.Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
+            if (!string.IsNullOrEmpty(paymentStatusFilter))
+            {
+                payments = payments.Where(p => p.Status.ToString().Equals(paymentStatusFilter, StringComparison.OrdinalIgnoreCase));
+            }
+
+            var totalPayments = payments.Count();
+            var totalPages = (int)Math.Ceiling((double)totalPayments / pageSize);
+
+            var paginatedPayments = payments.Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
 
             var vm = new PaymentListViewModel()
             {
-                Payments = paginatedOrders,
+                Payments = paginatedPayments,
                 CurrentPage = currentPage,
                 TotalPages = totalPages,
                 PageSize = pageSize,
             };
+
+            ViewBag.PaymentStatusFilter = paymentStatusFilter;
+            ViewBag.SortPaymentDate = sortPaymentDate;
+
+
             return View(vm);
         }
 
