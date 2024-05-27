@@ -31,22 +31,43 @@ namespace DealDynamo.Controllers
         }
         // GET: ProductController
         [HttpGet]
-        public async Task<ActionResult> Index(int currentPage = 1, int pageSize = 10)
+        public async Task<ActionResult> Index(int currentPage = 1, int pageSize = 5, int? categoryFilter = null, string sortOrder = "asc")
         {
             IEnumerable<Product> products = _productRepository.GetAllProducts();
 
             if (await UserManager.IsInRoleAsync(await UserManager.GetUserAsync(User), "Seller"))
             {
                 string currentUserId = UserManager.GetUserId(User);
-                Guid currentSellerId = Guid.Parse(currentUserId); // Parse string to Guid
+                Guid currentSellerId = Guid.Parse(currentUserId);
                 products = products.Where(x => x.SellerID == currentSellerId);
             }
 
-            // Calculate total pages
+            // Apply category filter
+            if (categoryFilter.HasValue)
+            {
+                products = products.Where(p => p.CategoryID == categoryFilter.Value);
+            }
+
+            // Apply sorting
+            switch (sortOrder)
+            {
+                case "title_desc":
+                    products = products.OrderByDescending(p => p.Title);
+                    break;
+                case "price_asc":
+                    products = products.OrderBy(p => p.Price);
+                    break;
+                case "price_desc":
+                    products = products.OrderByDescending(p => p.Price);
+                    break;
+                default:
+                    products = products.OrderBy(p => p.Title);
+                    break;
+            }
+
             int totalProducts = products.Count();
             int totalPages = (int)Math.Ceiling(totalProducts / (double)pageSize);
 
-            // Paginate the product list
             var paginatedProducts = products
                 .Skip((currentPage - 1) * pageSize)
                 .Take(pageSize)
@@ -59,6 +80,9 @@ namespace DealDynamo.Controllers
                 TotalPages = totalPages,
                 PageSize = pageSize
             };
+
+            ViewBag.CategoryFilter = categoryFilter;
+            ViewBag.SortOrder = sortOrder;
 
             return View(viewModel);
         }

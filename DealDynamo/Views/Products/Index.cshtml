@@ -20,15 +20,36 @@
     </p>
 }
 
+<div class="d-flex align-items-center justify-content-evenly">
+    <div class="form-group">
+        <label for="categoryFilter">Filter by Category:</label>
+        <select id="categoryFilter" class="form-select">
+            <option value="">All</option>
+            @foreach (var category in _categoryRepository.GetAllCategories())
+            {
+                <option value="@category.Id" selected=@(ViewBag.CategoryFilter != null && ViewBag.CategoryFilter == category.Id)>@category.Title</option>
+            }
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="sortOrder">Sort by:</label>
+        <select id="sortOrder" class="form-select">
+            <option value="title_asc" selected=@(ViewBag.SortOrder == "title_asc")>Title (A-Z)</option>
+            <option value="title_desc" selected=@(ViewBag.SortOrder == "title_desc")>Title (Z-A)</option>
+            <option value="price_asc" selected=@(ViewBag.SortOrder == "price_asc" )>Price (Low to High)</option>
+            <option value="price_desc" selected=@(ViewBag.SortOrder == "price_desc")>Price (High to Low)</option>
+        </select>
+    </div>
+</div>
+
 <table class="table table-bordered">
     <thead>
         <tr>
             <th>@Html.DisplayNameFor(model => model.Products.FirstOrDefault().Title)</th>
-            <th>@Html.DisplayNameFor(model => model.Products.FirstOrDefault().Quantity)</th>
-            <th>@Html.DisplayNameFor(model => model.Products.FirstOrDefault().Description)</th>
             <th>@Html.DisplayNameFor(model => model.Products.FirstOrDefault().ProductImage)</th>
-            <th>@Html.DisplayNameFor(model => model.Products.FirstOrDefault().CategoryID)</th>
-            <th>@Html.DisplayNameFor(model => model.Products.FirstOrDefault().SellerID)</th>
+            <th>Category</th>
+            <th>Seller</th>
             <th>@Html.DisplayNameFor(model => model.Products.FirstOrDefault().Price)</th>
             <th></th>
         </tr>
@@ -38,20 +59,17 @@
         {
             <tr>
                 <td>@Html.DisplayFor(modelItem => item.Title)</td>
-                <td>@Html.DisplayFor(modelItem => item.Quantity)</td>
-                <td>@Html.DisplayFor(modelItem => item.Description)</td>
-                <td>@Html.DisplayFor(modelItem => item.ProductImage)</td>
+                <td><img src="~/images/@item.ProductImage" width="200" height="200"/></td>
                 <td>@_categoryRepository.GetCategoryById(item.CategoryID)?.Title</td>
                 <td>@UserManager.FindByIdAsync(Convert.ToString(item.SellerID)).GetAwaiter().GetResult().UserName</td>
                 <td>@Html.DisplayFor(modelItem => item.Price)</td>
                 <td>
-                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info">Details</a> |
                     @if (IsSeller)
                     {
-                        @Html.ActionLink("Edit", "Edit", "Products", new { id = item.Id })
- <text>|</text>
+                        @Html.ActionLink("Edit", "Edit", "Products", new { id = item.Id }, new{@class = "btn btn-primary"})
                     }
-                    @Html.ActionLink("Delete", "Delete", "Products", new { id = item.Id })
+                    @Html.ActionLink("Delete", "Delete", "Products", new { id = item.Id }, new {@class = "btn btn-danger"})
                 </td>
             </tr>
         }
@@ -61,24 +79,44 @@
 <nav aria-label="Page navigation">
     <ul class="pagination">
         <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
-            <a class="page-link" href="@Url.Action("Index", new { currentPage = 1, pageSize = Model.PageSize })">First</a>
+            <a class="page-link" href="@Url.Action("Index", new { currentPage = 1, pageSize = Model.PageSize, categoryFilter = ViewBag.CategoryFilter, sortOrder = ViewBag.SortOrder })">First</a>
         </li>
         <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
-            <a class="page-link" href="@Url.Action("Index", new { currentPage = Model.CurrentPage - 1, pageSize = Model.PageSize })">Previous</a>
+            <a class="page-link" href="@Url.Action("Index", new { currentPage = Model.CurrentPage - 1, pageSize = Model.PageSize, categoryFilter = ViewBag.CategoryFilter, sortOrder = ViewBag.SortOrder })">Previous</a>
         </li>
 
         @for (int i = 1; i <= Model.TotalPages; i++)
         {
             <li class="page-item @(Model.CurrentPage == i ? "active" : "")">
-                <a class="page-link" href="@Url.Action("Index", new { currentPage = i, pageSize = Model.PageSize })">@i</a>
+                <a class="page-link" href="@Url.Action("Index", new { currentPage = i, pageSize = Model.PageSize, categoryFilter = ViewBag.CategoryFilter, sortOrder = ViewBag.SortOrder })">@i</a>
             </li>
         }
 
         <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
-            <a class="page-link" href="@Url.Action("Index", new { currentPage = Model.CurrentPage + 1, pageSize = Model.PageSize })">Next</a>
+            <a class="page-link" href="@Url.Action("Index", new { currentPage = Model.CurrentPage + 1, pageSize = Model.PageSize, categoryFilter = ViewBag.CategoryFilter, sortOrder = ViewBag.SortOrder })">Next</a>
         </li>
         <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
-            <a class="page-link" href="@Url.Action("Index", new { currentPage = Model.TotalPages, pageSize = Model.PageSize })">Last</a>
+            <a class="page-link" href="@Url.Action("Index", new { currentPage = Model.TotalPages, pageSize = Model.PageSize, categoryFilter = ViewBag.CategoryFilter, sortOrder = ViewBag.SortOrder })">Last</a>
         </li>
     </ul>
 </nav>
+
+@section Scripts {
+<script>
+    $(document).ready(function () {
+        $('#categoryFilter, #sortOrder').change(function () {
+            var categoryFilter = $('#categoryFilter').val();
+            var sortOrder = $('#sortOrder').val();
+
+            var queryString = $.param({
+                categoryFilter: categoryFilter,
+                sortOrder: sortOrder,
+                currentPage: 1,
+                pageSize: @Model.PageSize
+            });
+
+            window.location.href = '@Url.Action("Index")' + '?' + queryString;
+        });
+    });
+</script>
+}
