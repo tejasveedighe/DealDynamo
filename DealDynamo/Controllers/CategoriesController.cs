@@ -9,6 +9,7 @@ using DealDynamo.Data;
 using DealDynamo.Models;
 using DealDynamo.Services;
 using Microsoft.AspNetCore.Authorization;
+using DealDynamo.Models.CategoryViewModels;
 
 namespace DealDynamo.Controllers
 {
@@ -23,9 +24,22 @@ namespace DealDynamo.Controllers
         }
 
         // GET: Categories
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int? page)
         {
-            return View(categoryRepository.GetAllCategories());
+            int pageSize = 10;
+
+            var categories = categoryRepository.GetAllCategories();
+
+            int pageNumber = page ?? 1;
+
+            var viewModel = new CategoryListViewModel
+            {
+                Categories = categories.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList(),
+                CurrentPage = pageNumber,
+                PageSize = pageSize,
+                TotalPages = (int)Math.Ceiling(categories.Count() / (double)pageSize)
+            };
+            return View(viewModel);
         }
 
         // GET: Categories/Details/5
