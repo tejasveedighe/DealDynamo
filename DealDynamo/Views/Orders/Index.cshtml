@@ -18,10 +18,10 @@
     <div class="form-group">
         <label for="orderStatusFilter">Filter by Order Status:</label>
         <select id="orderStatusFilter" class="form-select">
-            <option selected=@(ViewBag.OrderStatusFilter == "All") value="All">All</option>
+            <option selected=@(ViewBag?.OrderStatusFilter == "All") value="All">All</option>
             @foreach (var status in Enum.GetValues(typeof(OrderStatusEnum)).Cast<OrderStatusEnum>())
             {
-                <option value="@status" selected=@(ViewBag.OrderStatusFilter == status.ToString())>@status</option>
+                <option value="@status" selected=@(ViewBag?.OrderStatusFilter == status.ToString())>@status</option>
             }
         </select>
     </div>
@@ -32,7 +32,7 @@
             <option value="All">All</option>
             @foreach (var status in Enum.GetValues(typeof(PaymentStatusEnum)))
             {
-                <option value="@status" selected=@(ViewBag.PaymentStatusFilter == status.ToString())>@status</option>
+                <option value="@status" selected=@(ViewBag?.PaymentStatusFilter == status.ToString())>@status</option>
             }
         </select>
     </div>
@@ -40,8 +40,8 @@
     <div class="form-group">
         <label for="sortOrderDate">Sort by Order Date:</label>
         <select id="sortOrderDate" class="form-select">
-            <option value="asc" selected=@(ViewBag.SortOrderDate == "asc" )>Ascending</option>
-            <option value="desc" selected=@(ViewBag.SortOrderDate == "desc")>Descending</option>
+            <option value="asc" selected=@(ViewBag?.SortOrderDate == "asc" )>Ascending</option>
+            <option value="desc" selected=@(ViewBag?.SortOrderDate == "desc")>Descending</option>
         </select>
     </div>
 </div>

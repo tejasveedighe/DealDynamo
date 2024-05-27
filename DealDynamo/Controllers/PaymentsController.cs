@@ -4,6 +4,7 @@ using DealDynamo.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Stripe;
 
 namespace DealDynamo.Controllers
 {
@@ -50,7 +51,12 @@ namespace DealDynamo.Controllers
         // GET: PaymentsController/Details/5
         public ActionResult Details(int id)
         {
+
             var payment = _paymentsRepository.GetPaymentsById(id);
+
+            var service = new PaymentIntentService();
+            var res = service.Get(payment.StripePaymentId);
+
             return View(payment);
         }
 

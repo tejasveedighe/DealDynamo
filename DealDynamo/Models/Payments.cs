@@ -1,4 +1,5 @@
 ﻿using DealDynamo.Models.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace DealDynamo.Models
 {
@@ -8,6 +9,7 @@ namespace DealDynamo.Models
         public int OrderId { get; set; }
         public decimal Amount { get; set; }
         public PaymentStatusEnum Status { get; set; }
+        [Display(Name = "Payment Date")]
         public DateTime? PaymentDate { get; set; }
         public string? StripePaymentId { get; set; }
 

@@ -224,6 +224,8 @@ namespace DealDynamo.Controllers
             string userId = _userManager.GetUserId(User);
             _cartRepository.ClearCart(userId);
 
+            HttpContext.Session.Clear();
+
             var order = _orderRepository.GetOrderById(orderId);
             if (order == null) return Problem("Order Not Found, please try later");
 
