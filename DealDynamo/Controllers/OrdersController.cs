@@ -137,7 +137,7 @@ namespace DealDynamo.Controllers
                     {
                         PriceData = new SessionLineItemPriceDataOptions()
                         {
-                            UnitAmount = (long)(item.Product.Price * item.Quantity),
+                            UnitAmount = (long)(item.Product.Price * item.Quantity) * 10,
                             Currency = "USD",
                             ProductData = new SessionLineItemPriceDataProductDataOptions()
                             {
@@ -258,6 +258,8 @@ namespace DealDynamo.Controllers
         {
             var sessionService = new Stripe.Checkout.SessionService();
             var session = sessionService.Get(sessionId);
+
+            session.ExpiresAt = DateTime.Now;
 
             var order = _orderRepository.GetOrderById(orderId);
 
