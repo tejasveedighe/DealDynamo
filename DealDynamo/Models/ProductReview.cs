@@ -1,6 +1,7 @@
 ﻿using DealDynamo.Areas.Identity.Data;
 using DealDynamo.Models;
 using Newtonsoft.Json;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 namespace DealDynamo.Models
 {
@@ -24,6 +25,7 @@ namespace DealDynamo.Models
         public string Comment { get; set; }
 
         [Required]
+        [Display(Name = "Date Submitted")]
         public DateTime DateSubmitted { get; set; }
 
         // Navigation properties

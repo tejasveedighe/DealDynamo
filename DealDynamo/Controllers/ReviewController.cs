@@ -11,6 +11,7 @@ using DealDynamo.Services;
 using Microsoft.AspNetCore.Identity;
 using DealDynamo.Areas.Identity.Data;
 using Microsoft.AspNetCore.Authorization;
+using DealDynamo.Models.ReviewViewModels;
 
 namespace DealDynamo.Controllers
 {
@@ -32,7 +33,7 @@ namespace DealDynamo.Controllers
 
         // GET: Review
         [Authorize(Roles = "Admin, Seller")]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string buyerNameFilter, string productNameFilter, int? ratingFilter, DateTime? dateSubmittedFilter, string sortBy, bool isSortAscending = true, int currentPage = 1, int pageSize = 10)
         {
             var user = await _userManager.GetUserAsync(User);
 
@@ -50,10 +51,57 @@ namespace DealDynamo.Controllers
                 reviewsQuery = reviewsQuery.Where(r => r.Product.SellerID == Guid.Parse(currentUserId));
             }
 
-            var dealDynamoContext = await reviewsQuery.ToListAsync();
-            return View(dealDynamoContext);
-        }
+            // Apply filters
+            if (!string.IsNullOrEmpty(buyerNameFilter))
+            {
+                reviewsQuery = reviewsQuery.Where(r => r.User.UserName.Contains(buyerNameFilter));
+            }
 
+            if (!string.IsNullOrEmpty(productNameFilter))
+            {
+                reviewsQuery = reviewsQuery.Where(r => r.Product.Title.Contains(productNameFilter));
+            }
+
+            if (ratingFilter.HasValue)
+            {
+                reviewsQuery = reviewsQuery.Where(r => r.Rating == ratingFilter.Value);
+            }
+
+            if (dateSubmittedFilter.HasValue)
+            {
+                reviewsQuery = reviewsQuery.Where(r => r.DateSubmitted.Date == dateSubmittedFilter.Value.Date);
+            }
+
+            // Apply sorting
+            reviewsQuery = sortBy switch
+            {
+                "buyer" => isSortAscending ? reviewsQuery.OrderBy(r => r.User.UserName) : reviewsQuery.OrderByDescending(r => r.User.UserName),
+                "product" => isSortAscending ? reviewsQuery.OrderBy(r => r.Product.Title) : reviewsQuery.OrderByDescending(r => r.Product.Title),
+                "date" => isSortAscending ? reviewsQuery.OrderBy(r => r.DateSubmitted) : reviewsQuery.OrderByDescending(r => r.DateSubmitted),
+                _ => reviewsQuery.OrderBy(r => r.DateSubmitted)
+            };
+
+            // Pagination
+            var totalReviews = await reviewsQuery.CountAsync();
+            var totalPages = (int)Math.Ceiling((double)totalReviews / pageSize);
+            var reviews = await reviewsQuery.Skip((currentPage - 1) * pageSize).Take(pageSize).ToListAsync();
+
+            var viewModel = new ReviewListViewModel
+            {
+                Reviews = reviews,
+                BuyerNameFilter = buyerNameFilter,
+                ProductNameFilter = productNameFilter,
+                RatingFilter = ratingFilter,
+                DateSubmittedFilter = dateSubmittedFilter,
+                SortBy = sortBy,
+                IsSortAscending = isSortAscending,
+                CurrentPage = currentPage,
+                PageSize = pageSize,
+                TotalPages = totalPages
+            };
+
+            return View(viewModel);
+        }
 
         // GET: Review/Details/5
         public async Task<IActionResult> Details(int? id)
