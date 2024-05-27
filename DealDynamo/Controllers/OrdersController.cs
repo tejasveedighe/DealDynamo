@@ -278,14 +278,28 @@ namespace DealDynamo.Controllers
             return View(order);
         }
 
+        [HttpGet]
         [Authorize(Roles = "Buyer")]
-        public IActionResult ViewOrders(int currentPage = 1, int pageSize = 10)
+        public IActionResult ViewOrders(int currentPage = 1, int pageSize = 10, string orderStatusFilter = "All", string paymentStatusFilter = "All", string sortOrderDate = "asc")
         {
             var userId = _userManager.GetUserId(User);
             var orders = _orderRepository.GetAllOrder().Where(x => x.BuyerId == userId).ToList();
 
+            // Apply filters
+            if (orderStatusFilter != "All")
+            {
+                orders = orders.Where(o => o.OrderStatus.ToString() == orderStatusFilter).ToList();
+            }
+            if (paymentStatusFilter != "All")
+            {
+                orders = orders.Where(o => o.Payment?.Status.ToString() == paymentStatusFilter).ToList();
+            }
+
+            // Apply sorting
+            orders = sortOrderDate == "asc" ? orders.OrderBy(o => o.OrderDate).ToList() : orders.OrderByDescending(o => o.OrderDate).ToList();
+
             var totalOrders = orders.Count();
-            var totalPages = (int)Math.Ceiling((double)totalOrders / 10);
+            var totalPages = (int)Math.Ceiling((double)totalOrders / pageSize);
 
             var paginatedOrders = orders.Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
 
@@ -296,6 +310,10 @@ namespace DealDynamo.Controllers
                 TotalPages = totalPages,
                 PageSize = pageSize,
             };
+
+            ViewBag.OrderStatusFilter = orderStatusFilter;
+            ViewBag.PaymentStatusFilter = paymentStatusFilter;
+            ViewBag.SortOrderDate = sortOrderDate;
 
             return View(vm);
         }
