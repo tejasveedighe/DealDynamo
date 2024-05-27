@@ -29,7 +29,7 @@
                 <div class="d-flex align-items-center justify-content-between">
                     <span>Shipping Date</span>
                     <span>@if (Model?.ShippingDate != null) {
-                            Model?.ShippingDate?.ToString("dd-MM-yyyy");
+                            @Html.ValueFor(model => model.ShippingDate)
                         } else
                         {
                             <text>Will be Updated Soon.</text>

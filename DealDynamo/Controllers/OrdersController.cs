@@ -31,10 +31,11 @@ namespace DealDynamo.Controllers
 
         // GET: OrdersController
         [Authorize(Roles = "Admin, Seller")]
-        public async Task<IActionResult> Index(int currentPage = 1, int pageSize = 10)
+        public async Task<IActionResult> Index(int currentPage = 1, int pageSize = 10, string orderStatusFilter = "All", string paymentStatusFilter = "All", string sortOrderDate = "asc")
         {
             var user = await _userManager.GetUserAsync(User);
             IEnumerable<Order> orders;
+
             if (User.IsInRole("Seller"))
             {
                 orders = _orderRepository.GetOrdersBySellerId(user.Id);
@@ -43,8 +44,22 @@ namespace DealDynamo.Controllers
             {
                 orders = _orderRepository.GetAllOrder();
             }
+
+            // Apply filters
+            if (orderStatusFilter != "All")
+            {
+                orders = orders.Where(o => o.OrderStatus.ToString() == orderStatusFilter);
+            }
+            if (paymentStatusFilter != "All")
+            {
+                orders = orders.Where(o => o.Payment?.Status.ToString() == paymentStatusFilter);
+            }
+
+            // Apply sorting
+            orders = sortOrderDate == "asc" ? orders.OrderBy(o => o.OrderDate) : orders.OrderByDescending(o => o.OrderDate);
+
             var totalOrders = orders.Count();
-            var totalPages = (int)Math.Ceiling((double)totalOrders / 10);
+            var totalPages = (int)Math.Ceiling((double)totalOrders / pageSize);
 
             var paginatedOrders = orders.Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
 
@@ -56,8 +71,13 @@ namespace DealDynamo.Controllers
                 PageSize = pageSize,
             };
 
+            ViewBag.OrderStatusFilter = orderStatusFilter;
+            ViewBag.PaymentStatusFilter = paymentStatusFilter;
+            ViewBag.SortOrderDate = sortOrderDate;
+
             return View(vm);
         }
+
 
         // GET: OrdersController/Details/5
         [Authorize(Roles = "Admin, Seller")]
