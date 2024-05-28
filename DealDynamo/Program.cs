@@ -1,5 +1,6 @@
 using DealDynamo.Areas.Identity.Data;
 using DealDynamo.Data;
+using DealDynamo.Models;
 using DealDynamo.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -37,6 +38,10 @@ builder.Services.AddTransient<IProductReviewRepository, ProductReviewRepository>
 // Enabling Session
 builder.Services.AddSession();
 builder.Services.AddDistributedMemoryCache();
+
+// Email Configuration Service
+builder.Services.Configure<EmailConfiguration>(builder.Configuration.GetSection("EmailConfiguration"));
+builder.Services.AddTransient<IEmailService, EmailService>();
 
 var app = builder.Build();
 
