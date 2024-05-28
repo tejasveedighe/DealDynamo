@@ -1,16 +1,14 @@
 ﻿@model DealDynamo.Models.ProductViewModels.CreateProductViewModel
 
 @{
-    ViewData["Title"] = "Checkout";
+    ViewData["Title"] = "Create Product";
 }
 
-<h1>Create</h1>
-
-<h4>Product</h4>
+<h4>Create Product</h4>
 <hr />
 <div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create" enctype="multipart/form-data">
+    <div class="row">
+        <form class="col-md-4" asp-action="Create" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="Title" class="control-label"></label>
@@ -29,7 +27,7 @@
             </div>
             <div class="form-group">
                 <label asp-for="ProductImage" class="control-label"></label>
-                <input type="file" asp-for="ProductImage" accept="image/jpg" name="ProductImage" class="form-control" />
+                <input id="customFileUploadInput"  type="file" asp-for="ProductImage" accept="image/jpg" name="ProductImage" class="form-control" />
                 <span asp-validation-for="ProductImage" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -49,6 +47,7 @@
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>
         </form>
+        <img id="productImage" class="col-auto" src="" style="display:none;" height="300" width="300" />
     </div>
 </div>
 
@@ -60,4 +59,27 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+<script type="text/javascript">
+        function updateProductImage() {
+            var fileInput = document.getElementById("customFileUploadInput");
+            var imgElement = document.getElementById("productImage");
+            if (fileInput.files && fileInput.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    imgElement.src = e.target.result;
+                    imgElement.style.display = "block";
+                }
+                reader.readAsDataURL(fileInput.files[0]);
+            }
+        }
+
+        updateProductImage();
+
+        $("#customFileUploadInput").change(function () {
+            updateProductImage();
+            swal.fire("Image Ready to Upload");
+        });
+
+    </script>
+
 }

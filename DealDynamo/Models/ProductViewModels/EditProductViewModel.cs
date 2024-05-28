@@ -16,7 +16,7 @@ namespace DealDynamo.Models.ProductViewModels
 
         [DataType(DataType.Upload)]
         [Display(Name = "Update Product Image")]
-        public IFormFile NewProductImage { get; set; }
+        public IFormFile? NewProductImage { get; set; }
         public IEnumerable<Category> Categories { get; set; }
 
         [Required(ErrorMessage = "Category Must be Selected")]

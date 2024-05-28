@@ -2,6 +2,8 @@
 
 @{
     ViewData["Title"] = "Edit";
+
+    var update = (TempData["UpdateSuccess"] != null);
 }
 
 <h1>Edit</h1>
@@ -46,6 +48,7 @@
                 <span asp-validation-for="Price" class="text-danger"></span>
             </div>
             <input asp-for="ProductId" class="visually-hidden"/>
+            <input asp-for="ProductImage" class="visually-hidden"/>
             <div class="form-group">
                 <input type="submit" value="Update" class="btn btn-primary" />
             </div>
@@ -80,6 +83,20 @@
 
         $("#customFileUploadInput").change(function () {
             updateProductImage();
+            swal.fire("Image Ready to Upload");
         });
+
     </script>
+
+    @if(update)
+    {
+        <script>
+                swal.fire({
+                    icon: 'success',
+                    title: 'Updated',
+                    text: 'The product has been updated successfully.',
+                    showConfirmButton: true,
+                });
+        </script>
+    }
 }

@@ -4,60 +4,49 @@
     ViewData["Title"] = "Delete";
 }
 
-<h1>Delete</h1>
+<div class="row">
+    <div class="col-md-4">
+       <div class="card card-danger">
+            <div class="card-header">
+                <h3 class="card-title">Product Detail</h3>
+            </div>
+            <div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label asp-for="Title"></label>
+                        <input readonly class="form-control" asp-for="Title">
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Description"></label>
+                        <textarea readonly cols="5" type="text" class="form-control" asp-for="Description"></textarea>
+                    </div>
+                     <div class="form-group">
+                        <label asp-for="ProductImage"></label>
+                        <br/>
+                        <img src="~/images/@Model.ProductImage" width="200" height="200"/>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Quantity"></label>
+                        <input readonly class="form-control" asp-for="Quantity">
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Price"></label>
+                        <input readonly class="form-control" asp-for="Price">
+                    </div>
+                    <div class="form-group">
+                        <label hidden asp-for="CategoryID"></label>
+                        <input hidden class="form-control" asp-for="CategoryID">
+                    </div>
 
-<h3>Are you sure you want to delete this?</h3>
-<div>
-    <h4>Product</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Title)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Title)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Quantity)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Quantity)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Description)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Description)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ProductImage)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ProductImage)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.CategoryID)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.CategoryID)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.SellerID)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.SellerID)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Price)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Price)
-        </dd>
-    </dl>
-    
-    <form asp-action="Delete">
-        <input type="hidden" asp-for="Id" />
-        <input type="submit" value="Delete" class="btn btn-danger" /> |
-        <a asp-action="Index">Back to List</a>
-    </form>
+                </div>
+                <div class="card-footer">
+                    <form asp-action="Delete">
+                        <input type="hidden" asp-for="Id" />
+                        <input type="submit" value="Delete" class="btn btn-danger" /> |
+                        <a asp-action="Index">Back to List</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

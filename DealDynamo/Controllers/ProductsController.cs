@@ -31,7 +31,7 @@ namespace DealDynamo.Controllers
         }
         // GET: ProductController
         [HttpGet]
-        public async Task<ActionResult> Index(int currentPage = 1, int pageSize = 10, int? categoryFilter = null, string sortOrder = "title_asc")
+        public async Task<ActionResult> Index(int currentPage = 1, int pageSize = 4, int? categoryFilter = null, string sortOrder = "title_asc")
         {
             IEnumerable<Product> products = _productRepository.GetAllProducts();
 
@@ -200,14 +200,15 @@ namespace DealDynamo.Controllers
                     Quantity = vm.Quantity,
                     CategoryID = vm.CategoryId,
                     Description = vm.Description,
-                    ProductImage = UploadFile(vm.NewProductImage, vm.NewProductImage.FileName),
+                    ProductImage = vm.NewProductImage != null ? UploadFile(vm.NewProductImage, vm.NewProductImage.FileName) : vm.ProductImage,
                     SellerID = Guid.Parse(UserManager.GetUserId(User)),
                 };
 
                 _productRepository.UpdateProduct(product);
-                _productRepository.SaveChanges();
 
-                return RedirectToAction(nameof(Index));
+                TempData["UpdateSuccess"] = true;
+
+                return RedirectToAction(nameof(Edit), new {id = vm.ProductId});
             }
             catch
             {
