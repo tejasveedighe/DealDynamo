@@ -69,6 +69,10 @@
                 <td>@order.OrderStatus</td>
                 <td>@order?.Payment?.Status</td>
                 <td>
+                    @if(User.IsInRole("Admin"))
+                    {
+                        <a href="@Url.Action("Edit", "Orders", new { id = order.Id })" class="btn btn-warning">Edit</a>
+                    }
                     <a href="@Url.Action("Details", "Orders", new { id = order.Id })" class="btn btn-info">View</a>
                     <a href="@Url.Action("Delete", "Orders", new { id = order.Id })" class="btn btn-danger">Delete</a>
                 </td>
