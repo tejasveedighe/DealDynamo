@@ -36,9 +36,8 @@
                 </div>
                 <div class="form-group">
                     <label asp-for="Category"></label>
-                    <input readonly class="form-control" asp-for="Category">
+                    <input readonly class="form-control" value="@Model.Category.Title" />
                 </div>
-
             </div>
             <div class="card-footer">
                 @if(IsSeller)

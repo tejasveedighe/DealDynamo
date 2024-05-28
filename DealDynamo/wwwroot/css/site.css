@@ -74,3 +74,7 @@ body {
     align-self: center;
     text-align: center;
 }
+
+.inner {
+    text-align: start;
+}
