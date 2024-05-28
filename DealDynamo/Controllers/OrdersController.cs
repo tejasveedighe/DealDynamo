@@ -20,13 +20,15 @@ namespace DealDynamo.Controllers
         private readonly IOrderRepository _orderRepository;
         private readonly IProductRepository _productRepository;
         private readonly ICartRepository _cartRepository;
+        private readonly IEmailService _emailService;
         private readonly UserManager<ApplicationUser> _userManager;
-        public OrdersController(IOrderRepository orderRepository, UserManager<ApplicationUser> userManager, ICartRepository cartRepository, IProductRepository productRepository)
+        public OrdersController(IOrderRepository orderRepository, UserManager<ApplicationUser> userManager, ICartRepository cartRepository, IProductRepository productRepository, IEmailService emailService)
         {
             _orderRepository = orderRepository;
             _userManager = userManager;
             _cartRepository = cartRepository;
             _productRepository = productRepository;
+            _emailService = emailService;
         }
 
         // GET: OrdersController
@@ -216,13 +218,13 @@ namespace DealDynamo.Controllers
             }
         }
 
-        public IActionResult OrderConfirmation(int orderId, string sessionId)
+        public async Task<IActionResult> OrderConfirmation(int orderId, string sessionId)
         {
             var sessionService = new Stripe.Checkout.SessionService();
             var session = sessionService.Get(sessionId);
 
-            string userId = _userManager.GetUserId(User);
-            _cartRepository.ClearCart(userId);
+            var user =await _userManager.GetUserAsync(User);
+            _cartRepository.ClearCart(user.Id);
 
             HttpContext.Session.Clear();
 
@@ -245,6 +247,110 @@ namespace DealDynamo.Controllers
                 StripePaymentId = session.PaymentIntentId,
             };
             _orderRepository.UpdateOrder(order);
+
+            _emailService.SendEmail(new EmailData() { 
+                EmailToId = session.CustomerEmail,
+                EmailToName = user.UserName,
+                EmailSubject = "Order Confirmed",
+                EmailBody = $@"
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Order Confirmation</title>
+        <meta charset='UTF-8'>
+        <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+        <style>
+            body {{
+                font-family: Arial, sans-serif;
+                margin: 0;
+                padding: 0;
+            }}
+            .container {{
+                max-width: 600px;
+                margin: 40px auto;
+                padding: 20px;
+                background-color: #f9f9f9;
+                border: 1px solid #ddd;
+                border-radius: 10px;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            }}
+            .header {{
+                background-color: #333;
+                color: #fff;
+                padding: 20px;
+                border-bottom: 1px solid #333;
+            }}
+            .header h1 {{
+                margin-top: 0;
+            }}
+            .content {{
+                padding: 20px;
+            }}
+            .footer {{
+                background-color: #333;
+                color: #fff;
+                padding: 10px;
+                border-top: 1px solid #333;
+            }}
+            .order-items {{
+                margin-top: 20px;
+            }}
+            .order-items th, .order-items td {{
+                padding: 10px;
+                border: 1px solid #ddd;
+            }}
+            .order-items th {{
+                background-color: #f1f1f1;
+            }}
+        </style>
+    </head>
+    <body>
+        <div class='container'>
+            <div class='header'>
+                <h1>Order Confirmation</h1>
+            </div>
+            <div class='content'>
+                <p>Dear {session.ShippingDetails.Name},</p>
+                <p>Thank you for your recent order! We have received your payment and are processing your order.</p>
+                <p>Your order details are as follows:</p>
+                <ul>
+                    <li>Order Number: {order.Id}</li>
+                    <li>Order Date: {order.OrderDate?.ToString("yyyy-MM-dd")}</li>
+                    <li>Total: {order.TotalPrice:C}</li>
+                    <li>Order Status: {order.OrderStatus}</li>
+                    <li>Payment Status: {order.Payment.Status}</li>
+                </ul>
+                <div class='order-items'>
+                    <h2>Order Items</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Quantity</th>
+                                <th>Price Per Unit</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {string.Join("", order.OrderItems.Select(item => $@"
+                            <tr>
+                                <td>{item.Product.Title}</td>
+                                <td>{item.Quantity}</td>
+                                <td>{item.PricePerUnit:C}</td>
+                                <td>{item.Quantity * item.PricePerUnit:C}</td>
+                            </tr>"))}
+                        </tbody>
+                    </table>
+                </div>
+                <p>We will send you an email when your order ships. If you have any questions or concerns, please don't hesitate to contact us.</p>
+            </div>
+            <div class='footer'>
+                <p>&copy; [Your Company Name] {DateTime.Now.Year}</p>
+            </div>
+        </div>
+    </body>
+    </html>",
+            });
 
             foreach (var item in order.OrderItems)
             {

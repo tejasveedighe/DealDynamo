@@ -96,8 +96,9 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
-        $('input[type="checkbox"]').click(function () {
-            var $checkboxes = $('input[type="checkbox"]');
+        // Target only the Seller and Buyer checkboxes by their specific IDs
+        $('#Input_IsSeller, #Input_IsBuyer').click(function () {
+            var $checkboxes = $('#Input_IsSeller, #Input_IsBuyer');
             $checkboxes.not(this).prop('checked', false);
         });
     </script>
