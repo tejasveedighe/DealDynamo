@@ -1,4 +1,4 @@
-﻿@model DealDynamo.Models.ProductReview
+﻿@model DealDynamo.Models.ReviewViewModels.ReviewEditViewModel
 
 @{
     ViewData["Title"] = "Edit Review";
@@ -12,6 +12,11 @@
             </div>
             <form asp-action="Edit" method="post">
                 <div class="card-body">
+                    <input type="hidden" asp-for="ID" />
+                    <input type="hidden" asp-for="ProductID" />
+                    <input type="hidden" asp-for="UserId" />
+                    <div asp-validation-summary="All"></div>
+
                     <div class="form-group">
                         <label>@Html.DisplayNameFor(model => model.Rating)</label>
                         <input asp-for="Rating" class="form-control" />
@@ -28,17 +33,19 @@
                         <span asp-validation-for="DateSubmitted" class="text-danger"></span>
                     </div>
                     <div class="form-group">
-                        <label>Product @Html.DisplayNameFor(model => model.Product.Title)</label>
-                        <input class="form-control" value="@Model.Product.Title" readonly />
+                        <label>@Html.DisplayNameFor(model => model.ProductTitle)</label>
+                        <input class="form-control" asp-for="ProductTitle" readonly />
+                        <span asp-validation-for="ProductTitle" class="text-danger"></span>
                     </div>
                     <div class="form-group">
-                        <label>@Html.DisplayNameFor(model => model.User.UserName)</label>
-                        <input class="form-control" value="@Model.User.UserName" readonly />
+                        <label>@Html.DisplayNameFor(model => model.UserName)</label>
+                        <input class="form-control" asp-for="UserName" readonly />
+                        <span asp-validation-for="UserName" class="text-danger"></span>
                     </div>
                 </div>
                 <div class="card-footer">
                     <button class="btn btn-success" type="submit">Submit</button>
-                    <a class="btn btn-primary" asp-action="Index" >Back to List</a>
+                    <a class="btn btn-primary" asp-controller="Home" asp-action="Details" asp-route-id="@Model.ProductID">Back to Product</a>
                     <a class="btn btn-danger" asp-controller="Review" asp-action="Delete" asp-route-id="@Model.ID">Delete</a>
                 </div>
             </form>

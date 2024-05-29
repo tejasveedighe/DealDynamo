@@ -131,27 +131,45 @@ namespace DealDynamo.Controllers
                 return NotFound();
             }
 
-            var productReview = await _context.ProductReviews.FindAsync(id);
+            var productReview = await _context.ProductReviews
+                .Include(pr => pr.Product)
+                .Include(pr => pr.User)
+                .FirstOrDefaultAsync(pr => pr.ID == id);
+
+            var vm = new ReviewEditViewModel()
+            {
+                ID = productReview.ID,
+                Comment = productReview.Comment,
+                DateSubmitted = productReview.DateSubmitted,
+                ProductID = productReview.ProductID,
+                ProductTitle = productReview.Product.Title,
+                Rating = productReview.Rating,
+                UserId = productReview.UserId,
+                UserName = productReview.User.UserName
+            };
+
             if (productReview == null)
             {
                 return NotFound();
             }
-            ViewData["ProductID"] = new SelectList(_context.Product, "Id", "Id", productReview.ProductID);
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", productReview.UserId);
 
-            productReview.DateSubmitted = DateTime.Now;
+            if (User.IsInRole("Buyer"))
+            {
+                return View("UserEdit", vm);
+            }
 
-            return View(productReview);
+            return View(vm);
         }
+
 
         // POST: Review/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ID,ProductID,UserId,Rating,Comment,DateSubmitted")] ProductReview productReview)
+        public async Task<IActionResult> Edit(int id,  ReviewEditViewModel vm)
         {
-            if (id != productReview.ID)
+            if (id != vm.ID)
             {
                 return NotFound();
             }
@@ -160,12 +178,20 @@ namespace DealDynamo.Controllers
             {
                 try
                 {
-                    _context.Update(productReview);
+                    _context.Update(new ProductReview()
+                    {
+                        ID = id,
+                        UserId = vm.UserId,
+                        Rating = vm.Rating,
+                        Comment = vm.Comment,
+                        DateSubmitted = vm.DateSubmitted,
+                        ProductID = vm.ProductID,
+                    });
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ProductReviewExists(productReview.ID))
+                    if (!ProductReviewExists(vm.ID))
                     {
                         return NotFound();
                     }
@@ -174,13 +200,16 @@ namespace DealDynamo.Controllers
                         throw;
                     }
                 }
+                if (User.IsInRole("Buyer"))
+                {
+                    return RedirectToAction(actionName: "Details", controllerName: "Home", routeValues: new { id = vm.ProductID });
+                }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ProductID"] = new SelectList(_context.Product, "Id", "Id", productReview.ProductID);
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", productReview.UserId);
-
-
-            return RedirectToAction(actionName: "Details", controllerName: "Home", routeValues: new { id = productReview.ProductID });
+            else
+            {
+                return RedirectToAction(nameof(Edit), id);
+            }
         }
 
         // GET: Review/Delete/5
@@ -198,6 +227,11 @@ namespace DealDynamo.Controllers
             if (productReview == null)
             {
                 return NotFound();
+            }
+
+            if (User.IsInRole("Buyer"))
+            {
+                return View("UserDelete", productReview);
             }
 
             return View(productReview);
@@ -219,6 +253,12 @@ namespace DealDynamo.Controllers
             }
 
             await _context.SaveChangesAsync();
+
+            if (User.IsInRole("Buyer"))
+            {
+                return RedirectToAction("Details", "Home", new { id = productReview.ProductID });
+            }
+
             return RedirectToAction(nameof(Index));
         }
 
