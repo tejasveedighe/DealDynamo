@@ -4,9 +4,11 @@ using DealDynamo.Models;
 using DealDynamo.Models.HomeViewModels;
 using DealDynamo.Models.ProductViewModels;
 using DealDynamo.Services;
+using MailKit.Search;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using System.Globalization;
 
 namespace DealDynamo.Controllers
 {
@@ -29,7 +31,7 @@ namespace DealDynamo.Controllers
             _paymentsRepository = paymentsRepository;
         }
 
-        public async Task<IActionResult> Index(int currentPage = 1, int pageSize = 10)
+        public async Task<IActionResult> Index(string searchText, int? categoryFilter, string sortOption, int currentPage = 1, int pageSize = 10)
         {
             var user = await UserManager.GetUserAsync(User);
 
@@ -38,8 +40,29 @@ namespace DealDynamo.Controllers
                 ViewBag.Categories = _categoryRepository.GetAllCategories().ToList();
 
                 var products = _productRepository.GetAllProducts();
+
+                if (!string.IsNullOrEmpty(searchText))
+                {
+                    products = products.Where(p => p.Title.Contains(searchText, StringComparison.OrdinalIgnoreCase)).ToList();
+                }
+
+                if (categoryFilter.HasValue)
+                {
+                    products = products.Where(p => p.CategoryID == categoryFilter.Value).ToList();
+                }
+
+                switch (sortOption)
+                {
+                    case "name":
+                        products = products.OrderBy(p => p.Title).ToList();
+                        break;
+                    case "price":
+                        products = products.OrderBy(p => p.Price).ToList();
+                        break;
+                }
+
                 var totalProducts = products.Count();
-                var totalPages = (int)Math.Ceiling((double)totalProducts / 10);
+                var totalPages = (int)Math.Ceiling((double)totalProducts / pageSize);
 
                 var paginatedProducts = products.Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
 
@@ -49,6 +72,9 @@ namespace DealDynamo.Controllers
                     CurrentPage = currentPage,
                     TotalPages = totalPages,
                     PageSize = pageSize,
+                    SearchText = searchText,
+                    CategoryFilter = categoryFilter,
+                    SortOption = sortOption
                 };
 
                 return View("BuyerView", vm);
