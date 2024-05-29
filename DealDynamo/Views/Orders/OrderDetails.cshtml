@@ -97,6 +97,7 @@
         @if(Model.OrderStatus != DealDynamo.Models.Enums.OrderStatusEnum.Cancelled)
         {
             <a class="btn btn-danger" asp-action="CancelOrder" asp-controller="Orders" asp-route-id="@Model.Id">Cancel Order</a>
+            <a class="btn btn-warning" asp-action="RetryPayment" asp-controller="Payments" asp-route-id="@Model.Id">Retry Payment</a>
         }
         <a class="btn btn-primary" asp-action="ViewOrders">Back to List</a>
     </div>

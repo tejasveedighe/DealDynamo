@@ -389,7 +389,7 @@ namespace DealDynamo.Controllers
 
         [HttpGet]
         [Authorize(Roles = "Buyer")]
-        public IActionResult ViewOrders(int currentPage = 1, int pageSize = 10, string orderStatusFilter = "All", string paymentStatusFilter = "All", string sortOrderDate = "asc")
+        public IActionResult ViewOrders(int currentPage = 1, int pageSize = 10, string orderStatusFilter = "All", string paymentStatusFilter = "All", string sortOrderDate = "desc")
         {
             var userId = _userManager.GetUserId(User);
             var orders = _orderRepository.GetAllOrder().Where(x => x.BuyerId == userId).ToList();
