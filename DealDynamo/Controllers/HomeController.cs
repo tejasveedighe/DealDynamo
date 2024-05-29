@@ -62,7 +62,7 @@ namespace DealDynamo.Controllers
             var totalSales = _paymentsRepository.GetAllPayments().Sum(p => p.Amount);
 
             List<MonthlySalesData> monthlySales = new List<MonthlySalesData>();
-            if(User.IsInRole("Admin"))
+            if (User.IsInRole("Admin"))
             {
 
                 monthlySales = _paymentsRepository.GetAllPayments()
@@ -75,7 +75,8 @@ namespace DealDynamo.Controllers
                 })
                 .OrderBy(ms => ms.Month)
                 .ToList() ?? new List<MonthlySalesData>();
-            } else
+            }
+            else
             {
                 var sellerId = Guid.Parse(UserManager.GetUserId(User));
 
@@ -100,10 +101,11 @@ namespace DealDynamo.Controllers
 
 
             IEnumerable<Order> orders;
-            if(User.IsInRole("Admin"))
+            if (User.IsInRole("Admin"))
             {
                 orders = _orderRepository.GetAllOrder();
-            } else
+            }
+            else
             {
                 orders = _orderRepository.GetOrdersBySellerId(user.Id);
             }

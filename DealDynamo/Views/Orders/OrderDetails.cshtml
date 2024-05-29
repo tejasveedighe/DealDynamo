@@ -66,8 +66,21 @@
                 <div class="d-flex align-items-center justify-content-between">
                     <span>Payment Status</span>
                     <span>@Model?.Payment?.Status<span>
+                </div> 
+                <div class="d-flex align-items-center justify-content-between">
+                    <span>Amount Payed</span>
+                    <span>$@Model?.Payment?.Amount<span>
                 </div>
+
             </div>
+            <div class="mt-4">
+                @if(Model.Payment == null || Model.Payment.Status == DealDynamo.Models.Enums.PaymentStatusEnum.Pending)
+                {
+                    <a class="btn btn-warning" asp-action="RetryPayment" asp-controller="Payments" asp-route-id="@Model.Id">Retry Payment</a>
+                }
+                <a class="btn btn-primary" asp-action="ViewOrders">Back to List</a>
+            </div>
+
         </div>
         <table class="table table-bordered table-striped">
             <thead>
@@ -77,7 +90,7 @@
                 @foreach (var item in Model.OrderItems)
                 {
                     <tr>
-                        <td class="d-flex align-items-start gap-3">
+                        <td class="d-flex align-items-start gap-5">
                             <img src="~/images/@item.Product.ProductImage" alt="@item.Product.Title" width="100" height="100" />
                             <span>
                                 <h5>@item?.Product?.Title</h5>
@@ -85,23 +98,19 @@
                                     <li>Quantity: @item.Quantity</li>
                                     <li>Price: $@item?.Product?.Price</li>
                                     <li>Sub-Total Price: $@(item?.Product?.Price * item.Quantity)</li>
+                                    <li>Status: @item.Status</li>
                                 </ul>
                             </span>
+                            @if(item.Status != DealDynamo.Models.Enums.OrderItemStatus.Cancelled && item.Status != DealDynamo.Models.Enums.OrderItemStatus.Delivered)
+                            {
+                                <span>
+                                    <a class="btn btn-danger" asp-action="CancelItem" asp-controller="Orders" asp-route-itemId="@item.Id">Cancel Item</a>
+                                </span>
+                            }
                         </td>
                     </tr>
                 }
             </tbody>
         </table>
-    </div>
-    <div class="mt-4">
-        @if(Model.OrderStatus != DealDynamo.Models.Enums.OrderStatusEnum.Cancelled)
-        {
-            <a class="btn btn-danger" asp-action="CancelOrder" asp-controller="Orders" asp-route-id="@Model.Id">Cancel Order</a>
-        }
-        @if(Model.Payment == null || Model.Payment.Status == DealDynamo.Models.Enums.PaymentStatusEnum.Pending)
-        {
-            <a class="btn btn-warning" asp-action="RetryPayment" asp-controller="Payments" asp-route-id="@Model.Id">Retry Payment</a>
-        }
-        <a class="btn btn-primary" asp-action="ViewOrders">Back to List</a>
     </div>
 </div>

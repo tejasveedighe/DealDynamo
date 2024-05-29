@@ -63,7 +63,7 @@ namespace DealDynamo.Controllers
             return View(payment);
         }
 
-        [Authorize(Roles ="Buyer")]
+        [Authorize(Roles = "Buyer")]
         public async Task<IActionResult> RetryPayment(int id)
         {
             var order = _orderRepository.GetOrderById(id);

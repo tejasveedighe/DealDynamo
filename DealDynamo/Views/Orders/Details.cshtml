@@ -1,4 +1,5 @@
-﻿@model DealDynamo.Models.Order
+﻿@using DealDynamo.Models.Enums
+@model DealDynamo.Models.Order
 
 @{
     ViewData["Title"] = "Order Details";
@@ -21,6 +22,11 @@
                 <div class="d-flex align-items-center justify-content-between">
                     <span>Order Total</span>
                     <span>$@Model?.TotalPrice<span>
+                </div>
+
+                <div class="d-flex align-items-center justify-content-between">
+                    <span>Delivering To</span>
+                    <span>@Model?.Buyer?.UserName<span>
                 </div>
             </div>
             <br/>
@@ -67,6 +73,14 @@
                     <span>Payment Status</span>
                     <span>@Model?.Payment?.Status<span>
                 </div>
+                <div class="d-flex align-items-center justify-content-between">
+                    <span>Amount Payed</span>
+                    <span>$@Model?.Payment.Amount<span>
+                </div>
+
+            </div>
+            <div class="mt-4">
+                <a class="btn btn-primary" asp-action="Index">Back to List</a>
             </div>
         </div>
         <table class="table table-bordered table-striped">
@@ -85,6 +99,25 @@
                                     <li>Quantity: @item.Quantity</li>
                                     <li>Price: $@item?.Product?.Price</li>
                                     <li>Sub-Total Price: $@(item?.Product?.Price * item.Quantity)</li>
+                                    <li>Status: 
+                                        @if(User.IsInRole("Seller"))
+                                        {
+                                            
+                                        <form method="post" asp-action="UpdateStatus" asp-controller="Orders">
+                                            <select class="form-select" name="status" onchange="this.form.submit()">
+                                                @foreach (OrderItemStatus status in Enum.GetValues(typeof(OrderItemStatus)))
+                                                {
+                                                    if(status == OrderItemStatus.Cancelled) { continue; }
+                                                    <option class="form-option" value="@status" selected=@(status == item.Status)>@status</option>
+                                                }
+                                            </select>
+                                            <input type="hidden" name="orderItemId" value="@item.Id" />
+                                            </form>
+                                        } else
+                                        {
+                                            <text>@item.Status</text>
+                                        }
+                                    </li>
                                 </ul>
                             </span>
                         </td>
@@ -92,16 +125,6 @@
                 }
             </tbody>
         </table>
-    </div>
-    <div class="mt-4">
-        @if(Model.OrderStatus != DealDynamo.Models.Enums.OrderStatusEnum.Cancelled && User.IsInRole("Seller"))
-        {
-            <a class="btn btn-warning" asp-action="Edit" asp-controller="Orders" asp-route-id="@Model.Id">Update Shipping</a>
-        } else
-        {
-            <p class="text-danger">The Order has been cancelled by the User.</p>
-        }
-        <a class="btn btn-primary" asp-action="Index">Back to List</a>
     </div>
 </div>
 

@@ -22,6 +22,7 @@ namespace DealDynamo.Data
         public void DeletePayments(int id)
         {
             _context.Payments.Remove(GetPaymentsById(id));
+            SaveChanges();
         }
 
         public IEnumerable<Payments> GetAllPayments()
@@ -43,6 +44,7 @@ namespace DealDynamo.Data
         public void UpdatePayments(Payments payments)
         {
             _context.Payments.Update(payments);
+            SaveChanges();
         }
     }
 }

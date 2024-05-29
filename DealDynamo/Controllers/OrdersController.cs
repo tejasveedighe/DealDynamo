@@ -1,12 +1,14 @@
 ﻿using DealDynamo.Areas.Identity.Data;
 using DealDynamo.Helper;
 using DealDynamo.Models;
+using DealDynamo.Models.Enums;
 using DealDynamo.Models.OrderViewModels;
 using DealDynamo.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Stripe;
 using Stripe.Checkout;
 using System.Collections.Generic;
@@ -17,23 +19,28 @@ namespace DealDynamo.Controllers
     [Authorize]
     public class OrdersController : Controller
     {
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly IOrderRepository _orderRepository;
         private readonly IProductRepository _productRepository;
         private readonly ICartRepository _cartRepository;
         private readonly IEmailService _emailService;
-        private readonly UserManager<ApplicationUser> _userManager;
-        public OrdersController(IOrderRepository orderRepository, UserManager<ApplicationUser> userManager, ICartRepository cartRepository, IProductRepository productRepository, IEmailService emailService)
+        private readonly IOrderItemRepository _orderItemRepository;
+        private readonly IPaymentsRepository _paymentsRepository;
+
+        public OrdersController(IOrderRepository orderRepository, UserManager<ApplicationUser> userManager, ICartRepository cartRepository, IProductRepository productRepository, IEmailService emailService, IOrderItemRepository orderItemRepository, IPaymentsRepository paymentsRepository)
         {
             _orderRepository = orderRepository;
             _userManager = userManager;
             _cartRepository = cartRepository;
             _productRepository = productRepository;
             _emailService = emailService;
+            _orderItemRepository = orderItemRepository;
+            _paymentsRepository = paymentsRepository;
         }
 
         // GET: OrdersController
         [Authorize(Roles = "Admin, Seller")]
-        public async Task<IActionResult> Index(int currentPage = 1, int pageSize = 10, string orderStatusFilter = "All", string paymentStatusFilter = "All", string sortOrderDate = "asc")
+        public async Task<IActionResult> Index(int currentPage = 1, int pageSize = 10, string paymentStatusFilter = "All", string sortOrderDate = "desc")
         {
             var user = await _userManager.GetUserAsync(User);
             IEnumerable<Order> orders;
@@ -48,10 +55,6 @@ namespace DealDynamo.Controllers
             }
 
             // Apply filters
-            if (orderStatusFilter != "All")
-            {
-                orders = orders.Where(o => o.OrderStatus.ToString() == orderStatusFilter);
-            }
             if (paymentStatusFilter != "All")
             {
                 orders = orders.Where(o => o.Payment?.Status.ToString() == paymentStatusFilter);
@@ -73,19 +76,23 @@ namespace DealDynamo.Controllers
                 PageSize = pageSize,
             };
 
-            ViewBag.OrderStatusFilter = orderStatusFilter;
             ViewBag.PaymentStatusFilter = paymentStatusFilter;
             ViewBag.SortOrderDate = sortOrderDate;
 
             return View(vm);
         }
 
-
         // GET: OrdersController/Details/5
         [Authorize(Roles = "Admin, Seller")]
         public ActionResult Details(int id)
         {
             var order = _orderRepository.GetOrderById(id);
+            var userId = _userManager.GetUserId(User);
+
+            if(User.IsInRole("Seller"))
+            {
+                order.OrderItems = order.OrderItems.Where(order => order.SellerId == userId).ToList();
+            }
             return View(order);
         }
 
@@ -121,8 +128,8 @@ namespace DealDynamo.Controllers
                 var domain = "http://localhost:5035/";
                 var options = new SessionCreateOptions()
                 {
-                    SuccessUrl = domain + $"Orders/OrderConfirmation?orderId={order.Id}&sessionId={{CHECKOUT_SESSION_ID}}",
-                    CancelUrl = domain + $"Orders/Cancel?orderId={order.Id}&sessionId={{CHECKOUT_SESSION_ID}}",
+                    SuccessUrl = domain + $"Orders/OrderConfirmation?itemId={order.Id}&sessionId={{CHECKOUT_SESSION_ID}}",
+                    CancelUrl = domain + $"Orders/Cancel?itemId={order.Id}&sessionId={{CHECKOUT_SESSION_ID}}",
                     LineItems = new List<SessionLineItemOptions>(),
                     Mode = "payment",
                     BillingAddressCollection = "auto",
@@ -165,7 +172,7 @@ namespace DealDynamo.Controllers
         }
 
         // GET: OrdersController/Edit/5
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Seller")]
         public ActionResult Edit(int id)
         {
             var order = _orderRepository.GetOrderById(id);
@@ -173,7 +180,7 @@ namespace DealDynamo.Controllers
         }
 
         // POST: OrdersController/Edit/5
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Seller")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Edit(Order order)
@@ -436,6 +443,12 @@ namespace DealDynamo.Controllers
         {
             var order = _orderRepository.GetOrderById(id);
             order.OrderStatus = Models.Enums.OrderStatusEnum.Cancelled;
+
+            foreach(var orderItem in order.OrderItems)
+            {
+                orderItem.Status = Models.Enums.OrderItemStatus.Cancelled;
+            }
+
             if (order.Payment != null)
             {
                 order.Payment.Status = Models.Enums.PaymentStatusEnum.Refunded;
@@ -462,6 +475,40 @@ namespace DealDynamo.Controllers
             _orderRepository.UpdateOrder(order);
 
             return RedirectToAction(nameof(OrderDetails), new { id });
+        }
+        public IActionResult CancelItem(int itemId)
+        {
+            var orderItem = _orderItemRepository.GetItemById(itemId);
+            orderItem.Status = Models.Enums.OrderItemStatus.Cancelled;
+
+            var order = _orderRepository.GetOrderById(orderItem.OrderId);
+
+            order.Payment.Amount -= orderItem.Quantity * orderItem.PricePerUnit;
+
+            return RedirectToAction(nameof(OrderDetails), new { id = order.Id });
+        }
+
+        [Authorize(Roles ="Seller")]
+        [HttpPost]
+        public IActionResult UpdateStatus(int orderItemId, OrderItemStatus status)
+        {
+            var orderItem = _orderItemRepository.GetItemById(orderItemId);
+            if (orderItem != null)
+            {
+                orderItem.Status = status;
+                _orderItemRepository.UpdateItem(orderItem);
+            }
+
+            var order = _orderRepository.GetOrderById(orderItem.OrderId);
+
+            _emailService.SendEmail(new EmailData() {
+                EmailToId = order.Buyer.Email,
+                EmailToName = order.Buyer.UserName,
+                EmailSubject = "Order Item Status Update",
+                EmailBody = $"Dear {order.Buyer.UserName}, the status of Order Id: ${order.Id} item has been updated. Please check the site for more details."
+            });
+
+            return RedirectToAction(nameof(Details), new { id = orderItem.OrderId});
         }
     }
 }

@@ -34,6 +34,7 @@ builder.Services.AddTransient<IOrderRepository, OrderRepository>();
 builder.Services.AddTransient<ICartRepository, CartRepository>();
 builder.Services.AddTransient<IPaymentsRepository, PaymentsRepository>();
 builder.Services.AddTransient<IProductReviewRepository, ProductReviewRepository>();
+builder.Services.AddTransient<IOrderItemRepository, OrderItemRepository>();
 
 // Enabling Session
 builder.Services.AddSession();
