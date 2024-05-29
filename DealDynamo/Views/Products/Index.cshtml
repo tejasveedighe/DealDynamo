@@ -64,7 +64,7 @@
                 <td><img src="~/images/@item.ProductImage" width="200" height="200" /></td>
                 <td>@_categoryRepository.GetCategoryById(item.CategoryID)?.Title</td>
                 <td>@UserManager.FindByIdAsync(Convert.ToString(item.SellerID)).GetAwaiter().GetResult().UserName</td>
-                <td>@Html.DisplayFor(modelItem => item.Price)</td>
+                <td>$@Html.DisplayFor(modelItem => item.Price)</td>
                 <td>
                     <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info">Details</a> |
                     @if (IsSeller)

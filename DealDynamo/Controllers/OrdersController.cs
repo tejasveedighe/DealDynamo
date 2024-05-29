@@ -223,7 +223,7 @@ namespace DealDynamo.Controllers
             var sessionService = new Stripe.Checkout.SessionService();
             var session = sessionService.Get(sessionId);
 
-            var user =await _userManager.GetUserAsync(User);
+            var user = await _userManager.GetUserAsync(User);
             _cartRepository.ClearCart(user.Id);
 
             HttpContext.Session.Clear();
@@ -248,7 +248,8 @@ namespace DealDynamo.Controllers
             };
             _orderRepository.UpdateOrder(order);
 
-            _emailService.SendEmail(new EmailData() { 
+            _emailService.SendEmail(new EmailData()
+            {
                 EmailToId = session.CustomerEmail,
                 EmailToName = user.UserName,
                 EmailSubject = "Order Confirmed",
@@ -345,7 +346,7 @@ namespace DealDynamo.Controllers
                 <p>We will send you an email when your order ships. If you have any questions or concerns, please don't hesitate to contact us.</p>
             </div>
             <div class='footer'>
-                <p>&copy; [Your Company Name] {DateTime.Now.Year}</p>
+                <p>&copy; Deal Dynamo {DateTime.Now.Year}</p>
             </div>
         </div>
     </body>
@@ -435,7 +436,29 @@ namespace DealDynamo.Controllers
         {
             var order = _orderRepository.GetOrderById(id);
             order.OrderStatus = Models.Enums.OrderStatusEnum.Cancelled;
-            order.Payment.Status = Models.Enums.PaymentStatusEnum.Refunded;
+            if (order.Payment != null)
+            {
+                order.Payment.Status = Models.Enums.PaymentStatusEnum.Refunded;
+            }
+            else
+            {
+                order.Payment = new Payments()
+                {
+                    Amount = order.TotalPrice,
+                    Order = order,
+                    PaymentDate = null,
+                    OrderId = order.Id,
+                    Status = Models.Enums.PaymentStatusEnum.Pending,
+                    StripePaymentId = null
+                };
+                _emailService.SendEmail(new EmailData()
+                {
+                    EmailToId = order.Buyer.Email,
+                    EmailToName = order.Buyer.UserName,
+                    EmailSubject = "Payment Pending",
+                    EmailBody = "The Order Payment is pending"
+                });
+            }
             _orderRepository.UpdateOrder(order);
 
             return RedirectToAction(nameof(OrderDetails), new { id });

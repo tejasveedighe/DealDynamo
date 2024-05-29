@@ -29,8 +29,8 @@
                                 <h5>@item.Product.Title</h5>
                                 <ul>
                                     <li>Quantity: @item.Quantity</li>
-                                    <li>Price: &#8377;@item.Product.Price</li>
-                                    <li>Sub-Total Price: &#8377;@(item.Product.Price * item.Quantity)</li>
+                                    <li>Price: $@item.Product.Price</li>
+                                    <li>Sub-Total Price: $@(item.Product.Price * item.Quantity)</li>
                                 </ul>
                             </span>
                         </td>
@@ -40,7 +40,7 @@
         </table>
         <div class="position-sticky top-0 w-50 h-100 bg-secondary p-4">
             <h6 class="text-start">Payment Details: </h6>
-            <div>Order Total: @Model.TotalPrice</div>
+            <div>Order Total: $@Model.TotalPrice</div>
             <div>Payment Status: @Model.Payment.Status</div>
             <div>Payment Date: @Model.Payment.PaymentDate</div>
             <div>Payment Mode: @if (Model.Payment.StripePaymentId != null)

@@ -22,6 +22,8 @@ namespace DealDynamo.Data
                 mailMessage.Body = emailData.EmailBody;
                 // Specify the email Subject
                 mailMessage.Subject = emailData.EmailSubject;
+                // Specify that email body is HTML
+                mailMessage.IsBodyHtml = true;
 
                 // Specify the SMTP server name and post number
                 System.Net.Mail.SmtpClient smtpClient = new System.Net.Mail.SmtpClient("smtp.gmail.com", 587);

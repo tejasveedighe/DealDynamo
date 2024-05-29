@@ -57,7 +57,7 @@
             @foreach (var order in Model.Orders)
             {
                 <tr>
-                    <td>₹@order.TotalPrice</td>
+                    <td>$@order.TotalPrice</td>
                     <td>@order?.Payment?.Status</td>
                     <td>@order.OrderStatus</td>
                     <td>@order.OrderDate?.ToString("dd-MM-yyyy")</td>

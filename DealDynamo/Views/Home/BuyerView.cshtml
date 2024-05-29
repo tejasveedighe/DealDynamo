@@ -29,7 +29,7 @@
             <img class="card-img-top ratio ratio-1x1" height="300" src="~/images/@item.ProductImage" alt="@item.Title" />
             <div class="card-body">
                 <h3 class="card-title">@item.Title</h3>
-                <p class="card-text">Price: @item.Price</p>
+                <p class="card-text">Price: $@item.Price</p>
                 <span class="badge text-white bg-primary">
                     @categories.FirstOrDefault(x => x.Id == item.CategoryID)?.Title
                 </span>
@@ -99,8 +99,8 @@
                         var nameB = $(b).find('.card-title').text().toLowerCase();
                         return nameA < nameB ? -1 : nameA > nameB ? 1 : 0;
                     } else if (sortOption === 'price') {
-                        var priceA = parseFloat($(a).find('.card-text:contains("Price: ")').text().replace('Price: ', ''));
-                        var priceB = parseFloat($(b).find('.card-text:contains("Price: ")').text().replace('Price: ', ''));
+                        var priceA = parseFloat($(a).find('.card-text:contains("Price: $")').text().replace('Price: $', ''));
+                        var priceB = parseFloat($(b).find('.card-text:contains("Price: $")').text().replace('Price: $', ''));
                         return priceA - priceB;
                     }
                     return 0;

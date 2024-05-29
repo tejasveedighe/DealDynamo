@@ -64,7 +64,7 @@
             <tr>
                 <td>@order.Id</td>
                 <td>@order?.Buyer?.UserName</td>
-                <td>₹@order.TotalPrice</td>
+                <td>$@order.TotalPrice</td>
                 <td data-order-date="@order.OrderDate?.ToString("yyyy-MM-dd")">@order.OrderDate?.ToString("dd-MM-yyyy")</td>
                 <td>@order.OrderStatus</td>
                 <td>@order?.Payment?.Status</td>
