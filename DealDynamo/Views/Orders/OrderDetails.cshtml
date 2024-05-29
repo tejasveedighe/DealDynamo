@@ -84,7 +84,12 @@
         </div>
         <table class="table table-bordered table-striped">
             <thead>
-                <th class="position-sticky top-0">Order Items</th>
+                <th class="position-sticky top-0">
+                    <span>
+                        Order Items
+                    </span>
+                    <a class="text-danger float-end" asp-action="Cancel" asp-route-id="@Model.Id">Cancel All Items</a>
+                </th>
             </thead>
             <tbody>
                 @foreach (var item in Model.OrderItems)

@@ -20,6 +20,7 @@ namespace DealDynamo.Models.ProductViewModels
         public int CategoryId { get; set; }
 
         [DataType(DataType.Currency)]
+        [Range(minimum:1, maximum: Int32.MaxValue)]
         public int Price { get; set; }
 
     }
