@@ -1,6 +1,5 @@
 ﻿@using DealDynamo.Models.Enums
 @model DealDynamo.Models.PaymentViewModels.PaymentListViewModel
-
 @{
     ViewData["Title"] = "Payments";
 }
@@ -26,7 +25,13 @@
         </select>
     </div>
 </div>
-
+@if (!Model.Payments.Any())
+{
+    <div class="alert alert-info" role="alert">
+        No records found for the selected filters.
+    </div>
+}
+else {
 <table class="table table-bordered">
     <thead>
         <tr>
@@ -35,7 +40,6 @@
             <th>Amount</th>
             <th>Status</th>
             <th>Payment Date</th>
-            <th>Stripe Payment ID</th>
             <th>Actions</th>
         </tr>
     </thead>
@@ -48,7 +52,6 @@
                 <td>@payment.Amount.ToString("C")</td>
                 <td>@payment.Status</td>
                 <td>@payment.PaymentDate?.ToString("g")</td>
-                <td>@payment.StripePaymentId</td>
                 <td>
                     <a href="@Url.Action("Details", "Payments", new { id = payment.Id })" class="btn btn-info">View</a>
                 </td>
@@ -81,6 +84,7 @@
         </li>
     </ul>
 </nav>
+}
 
 @section Scripts {
     <script>

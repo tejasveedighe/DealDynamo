@@ -9,8 +9,5 @@ public class ApplicationUser : IdentityUser
     public bool IsAdmin { get; set; } = false;
     public bool IsSeller { get; set; } = false;
     public bool IsBuyer { get; set; } = false;
-
-    // Navigation property
-    public ICollection<ProductReview> ProductReviews { get; set; }
 }
 

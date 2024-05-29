@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace DealDynamo.Models
 {
@@ -16,6 +17,7 @@ namespace DealDynamo.Models
         public int Price { get; set; }
 
         // Navigation Property
+        [JsonIgnore]
         public ICollection<ProductReview> ProductReviews { get; set; }
     }
 }

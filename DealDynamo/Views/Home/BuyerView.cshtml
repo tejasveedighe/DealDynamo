@@ -25,8 +25,10 @@
 <div id="productsList" class="product-cards" >
     @foreach (var item in Model.Products)
     {
-        <div data-product-id="@item.Id" data-category-id="@item.CategoryID" style="width: 18rem" class="product-item col-md-2 col align-self-start card mb-4 shadow-sm">
-            <img class="card-img-top ratio ratio-1x1" height="300" src="~/images/@item.ProductImage" alt="@item.Title" />
+        <div data-product-id="@item.Id" data-category-id="@item.CategoryID" style="width: 18rem" class="product-item col-md-2 col align-self-start card mb-4 shadow-sm block">
+            <a asp-action="Details" asp-route-id="@item.Id">
+                <img class="card-img-top ratio ratio-1x1" height="300" src="~/images/@item.ProductImage" alt="@item.Title" />
+            </a>
             <div class="card-body">
                 <h3 class="card-title">@item.Title</h3>
                 <p class="card-text">Price: $@item.Price</p>

@@ -94,7 +94,7 @@
         </table>
     </div>
     <div class="mt-4">
-        @if(Model.OrderStatus != DealDynamo.Models.Enums.OrderStatusEnum.Cancelled)
+        @if(Model.OrderStatus != DealDynamo.Models.Enums.OrderStatusEnum.Cancelled && User.IsInRole("Seller"))
         {
             <a class="btn btn-warning" asp-action="Edit" asp-controller="Orders" asp-route-id="@Model.Id">Update Shipping</a>
         } else

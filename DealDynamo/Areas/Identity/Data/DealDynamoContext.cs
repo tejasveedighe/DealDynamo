@@ -32,11 +32,6 @@ public class DealDynamoContext : IdentityDbContext<ApplicationUser>
           .WithMany(p => p.ProductReviews)
           .HasForeignKey(pr => pr.ProductID);
 
-        builder.Entity<ProductReview>()
-            .HasOne(pr => pr.User)
-            .WithMany(u => u.ProductReviews)
-            .HasForeignKey(pr => pr.UserId);
-
     }
 
     public DbSet<DealDynamo.Models.Category>? Category { get; set; }

@@ -23,14 +23,14 @@ namespace DealDynamo.Controllers
             _userManager = userManager;
         }
 
-    [Authorize(Roles = "Admin, Seller")]
+        [Authorize(Roles = "Admin, Seller")]
         // GET: PaymentsController
         [HttpGet]
         public IActionResult Index(int currentPage = 1, int pageSize = 10, string paymentStatusFilter = "", string sortPaymentDate = "")
         {
             var payments = _paymentsRepository.GetAllPayments();
 
-            if (!string.IsNullOrEmpty(paymentStatusFilter))
+            if (!string.IsNullOrEmpty(paymentStatusFilter) && !string.Equals(paymentStatusFilter, "All"))
             {
                 payments = payments.Where(p => p.Status.ToString().Equals(paymentStatusFilter, StringComparison.OrdinalIgnoreCase));
             }
@@ -59,12 +59,7 @@ namespace DealDynamo.Controllers
         // GET: PaymentsController/Details/5
         public ActionResult Details(int id)
         {
-
             var payment = _paymentsRepository.GetPaymentsById(id);
-
-            var service = new PaymentIntentService();
-            var res = service.Get(payment.StripePaymentId);
-
             return View(payment);
         }
 

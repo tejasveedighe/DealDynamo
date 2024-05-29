@@ -124,7 +124,7 @@ namespace DealDynamo.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Addresses");
+                    b.ToTable("Addresses", (string)null);
                 });
 
             modelBuilder.Entity("DealDynamo.Models.CartItem", b =>
@@ -148,7 +148,7 @@ namespace DealDynamo.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("CartItems");
+                    b.ToTable("CartItems", (string)null);
                 });
 
             modelBuilder.Entity("DealDynamo.Models.Category", b =>
@@ -169,7 +169,7 @@ namespace DealDynamo.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Category");
+                    b.ToTable("Category", (string)null);
                 });
 
             modelBuilder.Entity("DealDynamo.Models.Order", b =>
@@ -208,7 +208,7 @@ namespace DealDynamo.Migrations
 
                     b.HasIndex("BuyerId");
 
-                    b.ToTable("Orders");
+                    b.ToTable("Orders", (string)null);
                 });
 
             modelBuilder.Entity("DealDynamo.Models.OrderItems", b =>
@@ -243,7 +243,7 @@ namespace DealDynamo.Migrations
 
                     b.HasIndex("SellerId");
 
-                    b.ToTable("OrderItems");
+                    b.ToTable("OrderItems", (string)null);
                 });
 
             modelBuilder.Entity("DealDynamo.Models.Payments", b =>
@@ -274,7 +274,7 @@ namespace DealDynamo.Migrations
                     b.HasIndex("OrderId")
                         .IsUnique();
 
-                    b.ToTable("Payments");
+                    b.ToTable("Payments", (string)null);
                 });
 
             modelBuilder.Entity("DealDynamo.Models.Product", b =>
@@ -310,7 +310,7 @@ namespace DealDynamo.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Product");
+                    b.ToTable("Product", (string)null);
                 });
 
             modelBuilder.Entity("DealDynamo.Models.ProductReview", b =>
@@ -345,7 +345,7 @@ namespace DealDynamo.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("ProductReviews");
+                    b.ToTable("ProductReviews", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

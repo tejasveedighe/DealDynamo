@@ -79,7 +79,7 @@
                                     }
                                 </div>
                                 <div>
-                                    @if(user.Id == review.User.Id)
+                                    @if(user?.Id == review.User.Id)
                                     {
                                         <a class="btn btn-warning" asp-controller="Review" asp-route-id="@review.ID" asp-action="Edit">Edit Review</a>
                                         <a class="btn btn-danger" asp-controller="Review" asp-action="Delete" asp-route-id="@review.ID">Delete Review</a>
