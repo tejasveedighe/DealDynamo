@@ -43,6 +43,8 @@
     }
 </div>
 
+@if(Model.Products.Any()) {
+
 <table class="table table-bordered">
     <thead>
         <tr>
@@ -101,7 +103,13 @@
             <a class="page-link" href="@Url.Action("Index", new { currentPage = Model.TotalPages, pageSize = Model.PageSize, categoryFilter = ViewBag.CategoryFilter, sortOrder = ViewBag.SortOrder })">Last</a>
         </li>
     </ul>
-</nav>
+    </nav>
+}else
+{
+    <div class="alert alert-info" role="alert">
+        No records found for the selected filters.
+    </div>
+}
 
 @section Scripts {
 <script>

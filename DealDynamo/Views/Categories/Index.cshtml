@@ -12,6 +12,9 @@
     <input type="text" id="searchBox" placeholder="Search category..." class="form-control col-md-3" />
 </div>
 
+@if(Model.Categories.Any())
+{
+    
 <table class="table">
     <thead>
         <tr>
@@ -67,7 +70,14 @@
             <a class="page-link" href="@Url.Action("Index", new { page = Model.TotalPages, searchString = ViewData["SearchString"] })">Last</a>
         </li>
     </ul>
-</nav>
+    </nav>
+} else
+{
+    <div class="alert alert-info" role="alert">
+        No records found for the selected filters.
+    </div>
+
+}
 
 @section Scripts {
     <script>
