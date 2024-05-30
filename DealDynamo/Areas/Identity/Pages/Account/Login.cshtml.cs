@@ -14,12 +14,14 @@ namespace DealDynamo.Areas.Identity.Pages.Account
     public class LoginModel : PageModel
     {
         private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger<LoginModel> _logger;
 
-        public LoginModel(SignInManager<ApplicationUser> signInManager, ILogger<LoginModel> logger)
+        public LoginModel(SignInManager<ApplicationUser> signInManager, ILogger<LoginModel> logger, UserManager<ApplicationUser> userManager)
         {
             _signInManager = signInManager;
             _logger = logger;
+            _userManager = userManager;
         }
 
         /// <summary>
@@ -109,6 +111,27 @@ namespace DealDynamo.Areas.Identity.Pages.Account
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User logged in.");
+
+                    // Check if the returnUrl is for the orders/checkout page
+                    if (returnUrl.Contains("/orders/checkout", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var user = await _userManager.FindByEmailAsync(Input.Email);
+                        var roles = await _userManager.GetRolesAsync(user);
+
+                        // Check if the user is not a buyer
+                        if (!roles.Contains("Buyer"))
+                        {
+                            // Log out the user
+                            await _signInManager.SignOutAsync();
+                            _logger.LogWarning("Admin and Seller cannot buy items, must have a buyer account.");
+
+                            // Show error message and redirect to login page
+                            ModelState.AddModelError(string.Empty, "Admin and Seller cannot buy items. Please log in with a buyer account.");
+                            TempData["Error"] = "Admin and Seller cannot buy items. Please log in with a buyer account.";
+                            return Page();
+                        }
+                    }
+
                     return LocalRedirect(returnUrl);
                 }
                 if (result.RequiresTwoFactor)

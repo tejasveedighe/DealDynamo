@@ -89,7 +89,7 @@ namespace DealDynamo.Controllers
             var order = _orderRepository.GetOrderById(id);
             var userId = _userManager.GetUserId(User);
 
-            if(User.IsInRole("Seller"))
+            if (User.IsInRole("Seller"))
             {
                 order.OrderItems = order.OrderItems.Where(order => order.SellerId == userId).ToList();
             }
@@ -128,8 +128,8 @@ namespace DealDynamo.Controllers
                 var domain = "http://localhost:5035/";
                 var options = new SessionCreateOptions()
                 {
-                    SuccessUrl = domain + $"Orders/OrderConfirmation?itemId={order.Id}&sessionId={{CHECKOUT_SESSION_ID}}",
-                    CancelUrl = domain + $"Orders/Cancel?itemId={order.Id}&sessionId={{CHECKOUT_SESSION_ID}}",
+                    SuccessUrl = domain + $"Orders/OrderConfirmation?orderId={order.Id}&sessionId={{CHECKOUT_SESSION_ID}}",
+                    CancelUrl = domain + $"Orders/Cancel?orderId={order.Id}&sessionId={{CHECKOUT_SESSION_ID}}",
                     LineItems = new List<SessionLineItemOptions>(),
                     Mode = "payment",
                     BillingAddressCollection = "auto",
@@ -146,7 +146,7 @@ namespace DealDynamo.Controllers
                     {
                         PriceData = new SessionLineItemPriceDataOptions()
                         {
-                            UnitAmount = (long)(item.Product.Price * item.Quantity) * 10,
+                            UnitAmount = (long)(item.Product.Price * item.Quantity * 10),
                             Currency = "USD",
                             ProductData = new SessionLineItemPriceDataProductDataOptions()
                             {
@@ -167,7 +167,7 @@ namespace DealDynamo.Controllers
             }
             catch
             {
-                return RedirectToAction(nameof(Checkout));
+                return RedirectToAction("ViewCart", "Cart");
             }
         }
 
@@ -427,7 +427,6 @@ namespace DealDynamo.Controllers
                 PageSize = pageSize,
             };
 
-            ViewBag.OrderStatusFilter = orderStatusFilter;
             ViewBag.PaymentStatusFilter = paymentStatusFilter;
             ViewBag.SortOrderDate = sortOrderDate;
 
@@ -444,7 +443,7 @@ namespace DealDynamo.Controllers
             var order = _orderRepository.GetOrderById(id);
             order.OrderStatus = Models.Enums.OrderStatusEnum.Cancelled;
 
-            foreach(var orderItem in order.OrderItems)
+            foreach (var orderItem in order.OrderItems)
             {
                 orderItem.Status = Models.Enums.OrderItemStatus.Cancelled;
             }
@@ -488,7 +487,7 @@ namespace DealDynamo.Controllers
             return RedirectToAction(nameof(OrderDetails), new { id = order.Id });
         }
 
-        [Authorize(Roles ="Seller")]
+        [Authorize(Roles = "Seller")]
         [HttpPost]
         public IActionResult UpdateStatus(int orderItemId, OrderItemStatus status)
         {
@@ -504,20 +503,21 @@ namespace DealDynamo.Controllers
             int orderItemsCount = order.OrderItems.Count();
             int deliveredItemsCount = order.OrderItems.Where(o => o.Status == OrderItemStatus.Delivered).Count();
 
-            if(orderItemsCount == deliveredItemsCount)
+            if (orderItemsCount == deliveredItemsCount)
             {
                 order.OrderStatus = OrderStatusEnum.Complete;
                 _orderRepository.UpdateOrder(order);
             }
 
-            _emailService.SendEmail(new EmailData() {
+            _emailService.SendEmail(new EmailData()
+            {
                 EmailToId = order.Buyer.Email,
                 EmailToName = order.Buyer.UserName,
                 EmailSubject = "Order Item Status Update",
                 EmailBody = $"Dear {order.Buyer.UserName}, the status of Order Id: ${order.Id} item has been updated. Please check the site for more details."
             });
 
-            return RedirectToAction(nameof(Details), new { id = orderItem.OrderId});
+            return RedirectToAction(nameof(Details), new { id = orderItem.OrderId });
         }
     }
 }

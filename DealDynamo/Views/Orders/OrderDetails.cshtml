@@ -90,7 +90,11 @@
                     <span>
                         Order Items
                     </span>
-                    <a class="text-danger float-end" asp-action="Cancel" asp-route-id="@Model.Id">Cancel All Items</a>
+                    @if(Model.OrderStatus != DealDynamo.Models.Enums.OrderStatusEnum.Cancelled 
+                    && Model.OrderStatus != DealDynamo.Models.Enums.OrderStatusEnum.Complete)
+                    {
+                        <a class="text-danger float-end" asp-action="CancelOrder" asp-route-id="@Model.Id">Cancel All Items</a>
+                    }
                 </th>
             </thead>
             <tbody>
