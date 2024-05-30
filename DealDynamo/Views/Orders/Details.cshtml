@@ -54,30 +54,35 @@
             <br/>
             <h4>Payment Details</h4>
             <div class="rounded border p-2">
-                <div class="d-flex align-items-center justify-content-between">
-                    <span>Payment Date</span>
-                    <span>@if (Model?.Payment?.PaymentDate != null) 
-                        {
-                            @Model?.Payment?.PaymentDate?.ToString("dd-MM-yyyy")
-                        } else
-                        {
-                            <text>Will be Updated Soon.</text>
-                        }
-                    </span>
-                </div>
-                <div class="d-flex align-items-center justify-content-between">
-                    <span>Billing Address</span>
-                    <span>@Model?.Address?.HouseNumber @Model?.Address?.Street @Model?.Address?.City, @Model?.Address?.Country</span>
-                </div>
-                <div class="d-flex align-items-center justify-content-between">
-                    <span>Payment Status</span>
-                    <span>@Model?.Payment?.Status<span>
-                </div>
-                <div class="d-flex align-items-center justify-content-between">
-                    <span>Amount Payed</span>
-                    <span>$@Model?.Payment.Amount<span>
-                </div>
-
+                @if(Model.Payment != null)
+                {
+                    <div class="d-flex align-items-center justify-content-between">
+                        <span>Payment Date</span>
+                        <span>@if (Model?.Payment?.PaymentDate != null) 
+                            {
+                                @Model?.Payment?.PaymentDate?.ToString("dd-MM-yyyy")
+                            } else
+                            {
+                                <text>Will be Updated Soon.</text>
+                            }
+                        </span>
+                    </div>
+                    <div class="d-flex align-items-center justify-content-between">
+                        <span>Billing Address</span>
+                        <span>@Model?.Address?.HouseNumber @Model?.Address?.Street @Model?.Address?.City, @Model?.Address?.Country</span>
+                    </div>
+                    <div class="d-flex align-items-center justify-content-between">
+                        <span>Payment Status</span>
+                        <span>@Model?.Payment?.Status<span>
+                    </div>
+                    <div class="d-flex align-items-center justify-content-between">
+                        <span>Amount Payed</span>
+                        <span>$@Model?.Payment.Amount<span>
+                    </div>
+                } else
+                {
+                    <p>No Payment Details.</p>
+                }
             </div>
             <div class="mt-4">
                 <a class="btn btn-primary" asp-action="Index">Back to List</a>
@@ -100,7 +105,7 @@
                                     <li>Price: $@item?.Product?.Price</li>
                                     <li>Sub-Total Price: $@(item?.Product?.Price * item.Quantity)</li>
                                     <li>Status: 
-                                        @if(User.IsInRole("Seller"))
+                                        @if(User.IsInRole("Seller") && item.Status != OrderItemStatus.Delivered)
                                         {
                                             
                                         <form method="post" asp-action="UpdateStatus" asp-controller="Orders">

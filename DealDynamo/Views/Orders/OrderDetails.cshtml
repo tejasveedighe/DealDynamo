@@ -48,30 +48,32 @@
             <br/>
             <h4>Payment Details</h4>
             <div class="rounded border p-2">
-                <div class="d-flex align-items-center justify-content-between">
-                    <span>Payment Date</span>
-                    <span>@if (Model?.Payment?.PaymentDate != null) 
-                        {
-                            @Model?.Payment?.PaymentDate?.ToString("dd-MM-yyyy")
-                        } else
-                        {
-                            <text>Will be Updated Soon.</text>
-                        }
-                    </span>
-                </div>
-                <div class="d-flex align-items-center justify-content-between">
-                    <span>Billing Address</span>
-                    <span>@Model?.Address?.HouseNumber @Model?.Address?.Street @Model?.Address?.City, @Model?.Address?.Country</span>
-                </div>
-                <div class="d-flex align-items-center justify-content-between">
-                    <span>Payment Status</span>
-                    <span>@Model?.Payment?.Status<span>
-                </div> 
-                <div class="d-flex align-items-center justify-content-between">
-                    <span>Amount Payed</span>
-                    <span>$@Model?.Payment?.Amount<span>
-                </div>
-
+                @if(Model.Payment != null)
+                {
+                    <div class="d-flex align-items-center justify-content-between">
+                        <span>Payment Date</span>
+                        <span>@if (Model?.Payment?.PaymentDate != null) 
+                            {
+                                @Model?.Payment?.PaymentDate?.ToString("dd-MM-yyyy")
+                            } else
+                            {
+                                <text>Will be Updated Soon.</text>
+                            }
+                        </span>
+                    </div>
+                    <div class="d-flex align-items-center justify-content-between">
+                        <span>Billing Address</span>
+                        <span>@Model?.Address?.HouseNumber @Model?.Address?.Street @Model?.Address?.City, @Model?.Address?.Country</span>
+                    </div>
+                    <div class="d-flex align-items-center justify-content-between">
+                        <span>Payment Status</span>
+                        <span>@Model?.Payment?.Status<span>
+                    </div> 
+                    <div class="d-flex align-items-center justify-content-between">
+                        <span>Amount Payed</span>
+                        <span>$@Model?.Payment?.Amount<span>
+                    </div>
+                }
             </div>
             <div class="mt-4">
                 @if(Model.Payment == null || Model.Payment.Status == DealDynamo.Models.Enums.PaymentStatusEnum.Pending)

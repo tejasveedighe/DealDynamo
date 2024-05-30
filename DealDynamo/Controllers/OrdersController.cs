@@ -501,6 +501,15 @@ namespace DealDynamo.Controllers
 
             var order = _orderRepository.GetOrderById(orderItem.OrderId);
 
+            int orderItemsCount = order.OrderItems.Count();
+            int deliveredItemsCount = order.OrderItems.Where(o => o.Status == OrderItemStatus.Delivered).Count();
+
+            if(orderItemsCount == deliveredItemsCount)
+            {
+                order.OrderStatus = OrderStatusEnum.Complete;
+                _orderRepository.UpdateOrder(order);
+            }
+
             _emailService.SendEmail(new EmailData() {
                 EmailToId = order.Buyer.Email,
                 EmailToName = order.Buyer.UserName,

@@ -25,7 +25,6 @@ namespace DealDynamo.Controllers
             _orderRepository = orderRepository;
             _userManager = userManager;
             _orderItemRepository = orderItemRepository;
-
         }
 
         [Authorize(Roles = "Admin, Seller")]
