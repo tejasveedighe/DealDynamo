@@ -1,4 +1,5 @@
 ﻿using DealDynamo.Areas.Identity.Data;
+using DealDynamo.Models;
 using DealDynamo.Models.Enums;
 using DealDynamo.Models.PaymentViewModels;
 using DealDynamo.Services;
@@ -6,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Stripe;
 using Stripe.Checkout;
 
@@ -16,25 +18,52 @@ namespace DealDynamo.Controllers
         private readonly IPaymentsRepository _paymentsRepository;
         private readonly IOrderRepository _orderRepository;
         private readonly UserManager<ApplicationUser> _userManager;
-        public PaymentsController(IPaymentsRepository paymentsRepository, IOrderRepository orderRepository, UserManager<ApplicationUser> userManager)
+        private readonly IOrderItemRepository _orderItemRepository;
+        public PaymentsController(IPaymentsRepository paymentsRepository, IOrderRepository orderRepository, UserManager<ApplicationUser> userManager, IOrderItemRepository orderItemRepository)
         {
             _paymentsRepository = paymentsRepository;
             _orderRepository = orderRepository;
             _userManager = userManager;
+            _orderItemRepository = orderItemRepository;
+
         }
 
         [Authorize(Roles = "Admin, Seller")]
         // GET: PaymentsController
         [HttpGet]
-        public IActionResult Index(int currentPage = 1, int pageSize = 10, string paymentStatusFilter = "", string sortPaymentDate = "")
+        public async Task<IActionResult> Index(int currentPage = 1, int pageSize = 10, string paymentStatusFilter = "", string sortPaymentDate = "")
         {
-            var payments = _paymentsRepository.GetAllPayments();
+            var user = await _userManager.GetUserAsync(User);
 
+            IEnumerable<Payments> payments;
+            if (User.IsInRole("Seller"))
+            {
+                var orders = _orderRepository.GetOrdersBySellerId(user.Id);
+                payments = orders.Select(o => o.Payment).Where(p => p != null).ToList();
+            }
+            else
+            {
+                payments = _paymentsRepository.GetAllPayments();
+            }
+
+            // Apply payment status filter if specified
             if (!string.IsNullOrEmpty(paymentStatusFilter) && !string.Equals(paymentStatusFilter, "All"))
             {
                 payments = payments.Where(p => p.Status.ToString().Equals(paymentStatusFilter, StringComparison.OrdinalIgnoreCase));
             }
 
+            // Sort payments by payment date if specified
+            if (!string.IsNullOrEmpty(sortPaymentDate))
+            {
+                payments = sortPaymentDate.ToLower() switch
+                {
+                    "asc" => payments.OrderBy(p => p.PaymentDate).ToList(),
+                    "desc" => payments.OrderByDescending(p => p.PaymentDate).ToList(),
+                    _ => payments
+                };
+            }
+
+            // Pagination logic
             var totalPayments = payments.Count();
             var totalPages = (int)Math.Ceiling((double)totalPayments / pageSize);
 
@@ -51,9 +80,9 @@ namespace DealDynamo.Controllers
             ViewBag.PaymentStatusFilter = paymentStatusFilter;
             ViewBag.SortPaymentDate = sortPaymentDate;
 
-
             return View(vm);
         }
+
 
         [Authorize(Roles = "Admin, Seller")]
         // GET: PaymentsController/Details/5

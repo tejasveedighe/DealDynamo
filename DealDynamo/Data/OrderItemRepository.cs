@@ -17,6 +17,11 @@ namespace DealDynamo.Data
             SaveChanges();
         }
 
+        public IQueryable<OrderItems> GetAllItemByOrderId(int orderId)
+        {
+           return _context.OrderItems.Where(oi => oi.OrderId == orderId);
+        }
+
         public IQueryable<OrderItems> GetAllItems()
         {
             return _context.OrderItems;
