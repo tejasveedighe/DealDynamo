@@ -19,12 +19,15 @@ namespace DealDynamo.Controllers
         private readonly IOrderRepository _orderRepository;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IOrderItemRepository _orderItemRepository;
-        public PaymentsController(IPaymentsRepository paymentsRepository, IOrderRepository orderRepository, UserManager<ApplicationUser> userManager, IOrderItemRepository orderItemRepository)
+        private readonly ILogger<PaymentsController> _logger;
+        public PaymentsController(IPaymentsRepository paymentsRepository, IOrderRepository orderRepository, UserManager<ApplicationUser> userManager, IOrderItemRepository orderItemRepository, ILogger<PaymentsController> logger)
         {
             _paymentsRepository = paymentsRepository;
             _orderRepository = orderRepository;
             _userManager = userManager;
             _orderItemRepository = orderItemRepository;
+            _logger = logger;
+
         }
 
         [Authorize(Roles = "Admin, Seller")]
@@ -94,48 +97,57 @@ namespace DealDynamo.Controllers
         [Authorize(Roles = "Buyer")]
         public async Task<IActionResult> RetryPayment(int id)
         {
-            var order = _orderRepository.GetOrderById(id);
-            var user = await _userManager.GetUserAsync(User);
-
-            var domain = "http://localhost:5035/";
-            var options = new SessionCreateOptions()
+            try
             {
-                SuccessUrl = domain + $"Orders/OrderConfirmation?orderId={order.Id}&sessionId={{CHECKOUT_SESSION_ID}}",
-                CancelUrl = domain + $"Orders/Cancel?orderId={order.Id}&sessionId={{CHECKOUT_SESSION_ID}}",
-                LineItems = new List<SessionLineItemOptions>(),
-                Mode = "payment",
-                BillingAddressCollection = "auto",
-                ShippingAddressCollection = new SessionShippingAddressCollectionOptions()
-                {
-                    AllowedCountries = new List<string> { "US" }
-                },
-                CustomerEmail = user.Email,
-            };
 
-            foreach (var item in order.OrderItems)
-            {
-                var sessionListItem = new SessionLineItemOptions()
+                var order = _orderRepository.GetOrderById(id);
+                var user = await _userManager.GetUserAsync(User);
+
+                var domain = "http://localhost:5035/";
+                var options = new SessionCreateOptions()
                 {
-                    PriceData = new SessionLineItemPriceDataOptions()
+                    SuccessUrl = domain + $"Orders/OrderConfirmation?orderId={order.Id}&sessionId={{CHECKOUT_SESSION_ID}}",
+                    CancelUrl = domain + $"Orders/Cancel?orderId={order.Id}&sessionId={{CHECKOUT_SESSION_ID}}",
+                    LineItems = new List<SessionLineItemOptions>(),
+                    Mode = "payment",
+                    BillingAddressCollection = "auto",
+                    ShippingAddressCollection = new SessionShippingAddressCollectionOptions()
                     {
-                        UnitAmount = (long)(item.Product.Price * item.Quantity) * 10,
-                        Currency = "USD",
-                        ProductData = new SessionLineItemPriceDataProductDataOptions()
-                        {
-                            Name = item.Product.Title,
-                            Description = item.Product.Description,
-                        }
+                        AllowedCountries = new List<string> { "US" }
                     },
-                    Quantity = item.Quantity
+                    CustomerEmail = user.Email,
                 };
-                options.LineItems.Add(sessionListItem);
+
+                foreach (var item in order.OrderItems)
+                {
+                    var sessionListItem = new SessionLineItemOptions()
+                    {
+                        PriceData = new SessionLineItemPriceDataOptions()
+                        {
+                            UnitAmount = (long)(item.Product.Price * item.Quantity) * 10,
+                            Currency = "USD",
+                            ProductData = new SessionLineItemPriceDataProductDataOptions()
+                            {
+                                Name = item.Product.Title,
+                                Description = item.Product.Description,
+                            }
+                        },
+                        Quantity = item.Quantity
+                    };
+                    options.LineItems.Add(sessionListItem);
+                }
+
+                var service = new SessionService();
+                Session session = service.Create(options);
+
+                Response.Headers.Add("Location", session.Url);
+                return new StatusCodeResult(303);
             }
-
-            var service = new SessionService();
-            Session session = service.Create(options);
-
-            Response.Headers.Add("Location", session.Url);
-            return new StatusCodeResult(303);
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return RedirectToAction("OrderDetails", "Orders", new { id = id });
+            }
         }
 
     }

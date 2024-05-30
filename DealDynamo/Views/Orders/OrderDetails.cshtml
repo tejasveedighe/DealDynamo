@@ -73,6 +73,9 @@
                         <span>Amount Payed</span>
                         <span>$@Model?.Payment?.Amount<span>
                     </div>
+                } else
+                {
+                    <p class="text-danger">No Shipping Details</p>
                 }
             </div>
             <div class="mt-4">
@@ -112,7 +115,7 @@
                                     <li>Status: @item.Status</li>
                                 </ul>
                             </span>
-                            @if(item.Status != DealDynamo.Models.Enums.OrderItemStatus.Cancelled && item.Status != DealDynamo.Models.Enums.OrderItemStatus.Delivered)
+                            @if(item.Status != DealDynamo.Models.Enums.OrderItemStatus.Cancelled)
                             {
                                 <span>
                                     <a class="btn btn-danger" asp-action="CancelItem" asp-controller="Orders" asp-route-itemId="@item.Id">Cancel Item</a>

@@ -479,10 +479,33 @@ namespace DealDynamo.Controllers
         {
             var orderItem = _orderItemRepository.GetItemById(itemId);
             orderItem.Status = Models.Enums.OrderItemStatus.Cancelled;
+            _orderItemRepository.UpdateItem(orderItem);
 
             var order = _orderRepository.GetOrderById(orderItem.OrderId);
 
-            order.Payment.Amount -= orderItem.Quantity * orderItem.PricePerUnit;
+            if (order.OrderItems.Where(oi => oi.Status != OrderItemStatus.Cancelled).Count() == 0)
+            {
+                order.OrderStatus = OrderStatusEnum.Cancelled;
+            }
+
+            if (order.Payment != null)
+            {
+                order.Payment.Amount -= orderItem.Quantity * orderItem.PricePerUnit;
+            }
+            else
+            {
+                order.Payment = new Payments()
+                {
+                    OrderId = order.Id,
+                    Order = order,
+                    Amount = orderItem.Quantity * orderItem.PricePerUnit,
+                    PaymentDate = DateTime.Now,
+                    Status = PaymentStatusEnum.Failed,
+                    StripePaymentId = null
+                };
+            }
+
+            _orderRepository.UpdateOrder(order);
 
             return RedirectToAction(nameof(OrderDetails), new { id = order.Id });
         }

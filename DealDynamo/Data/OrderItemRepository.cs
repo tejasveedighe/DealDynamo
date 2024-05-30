@@ -19,7 +19,7 @@ namespace DealDynamo.Data
 
         public IQueryable<OrderItems> GetAllItemByOrderId(int orderId)
         {
-           return _context.OrderItems.Where(oi => oi.OrderId == orderId);
+            return _context.OrderItems.Where(oi => oi.OrderId == orderId);
         }
 
         public IQueryable<OrderItems> GetAllItems()
