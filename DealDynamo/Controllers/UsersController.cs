@@ -19,14 +19,15 @@ namespace DealDynamo.Controllers
             UserManager = userManager;
         }
         // GET: UsersController
-        public async Task<IActionResult> Index(string searchString, string roleFilter)
+        public IActionResult Index(string searchString, string roleFilter, int currentPage = 1, int pageSize = 3)
         {
             string currentUserId = UserManager.GetUserId(User);
             var users = UserManager.Users.Where(x => x.Id != currentUserId);
 
             if (!string.IsNullOrEmpty(searchString))
             {
-                users = users.Where(u => u.UserName.Contains(searchString));
+                searchString = searchString.ToLower();
+                users = users.Where(u => u.UserName.ToLower().Contains(searchString));
             }
 
             if (!string.IsNullOrEmpty(roleFilter))
@@ -45,11 +46,23 @@ namespace DealDynamo.Controllers
                 }
             }
 
+            var totalUsers = users.Count();
+            var totalPages = (int)Math.Ceiling(totalUsers / (double)pageSize);
+
+            var paginatedUsers = users
+                .Skip((currentPage - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
             ViewData["CurrentFilter"] = searchString;
             ViewData["RoleFilter"] = roleFilter;
+            ViewData["CurrentPage"] = currentPage;
+            ViewData["TotalPages"] = totalPages;
+            ViewData["PageSize"] = pageSize;
 
-            return View(users.ToList());
+            return View(paginatedUsers);
         }
+
 
         // GET: UsersController/Details/5
         public async Task<IActionResult> Details(string id)

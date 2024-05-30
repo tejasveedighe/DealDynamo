@@ -2,28 +2,25 @@
 
 @{
     ViewData["Title"] = "Users";
+    int currentPage = ViewData["CurrentPage"] != null ? (int)ViewData["CurrentPage"] : 1;
+    int totalPages = ViewData["TotalPages"] != null ? (int)ViewData["TotalPages"] : 1;
+    string currentFilter = ViewData["CurrentFilter"]?.ToString();
+    string roleFilter = ViewData["RoleFilter"]?.ToString();
+    int pageSize = ViewData["PageSize"] != null ? (int)ViewData["PageSize"] : 10;
 }
 
 <h1>Users</h1>
 
 <div class="mb-3">
-    <form method="get" asp-action="Index" class="form d-flex align-items-center gap-3">
-        <div class="form-group">
-            <label class="form-label" for="searchString">Search by username</label>
-            <br/>
-            <input class="form-control" type="text" name="searchString" value="@ViewData["CurrentFilter"]" class="form-control mr-2" placeholder="Search by name..." />
-        </div>
-        <div class="form-group">
-            <label for="roleFilter">Filter by Role</label>
-            <br/>
-            <select name="roleFilter" class="form-control mr-2">
-                <option value="">All Roles</option>
-                <option value="Admin">Admin</option>
-                <option value="Seller">Seller</option>
-                <option value="Buyer">Buyer</option>
-            </select>
-        </div>
-        <button type="submit" class="btn btn-primary mt-3">Filter</button>
+    <form method="get" asp-action="Index" class="form-inline">
+        <input type="text" name="searchString" value="@currentFilter" class="form-control mr-2" placeholder="Search by name..." />
+        <select name="roleFilter" class="form-control mr-2">
+            <option value="">All Roles</option>
+            <option value="Admin" selected=@(roleFilter == "Admin")>Admin</option>
+            <option value="Seller" selected=@(roleFilter == "Seller")>Seller</option>
+            <option value="Buyer" selected=@(roleFilter == "Buyer")>Buyer</option>
+        </select>
+        <button type="submit" class="btn btn-primary">Filter</button>
     </form>
 </div>
 
@@ -41,20 +38,10 @@
             </div>
             <div class="card-body">
                 <h5 class="card-title">@user.UserName</h5>
-                <p class="card-text">
-                    Roles:
-                    @if (user.IsAdmin)
-                    {
-                        <span class="badge badge-primary">Admin</span>
-                    }
-                    @if (user.IsSeller)
-                    {
-                        <span class="badge badge-secondary">Seller</span>
-                    }
-                    @if (user.IsBuyer)
-                    {
-                        <span class="badge badge-success">Buyer</span>
-                    }
+                <p class="card-text">Roles: 
+                    @if (user.IsAdmin) { <span class="badge badge-primary">Admin</span> }
+                    @if (user.IsSeller) { <span class="badge badge-secondary">Seller</span> }
+                    @if (user.IsBuyer) { <span class="badge badge-success">Buyer</span> }
                 </p>
             </div>
             <div class="card-footer">
@@ -64,6 +51,23 @@
             </div>
         </div>
     }
+
+    <nav aria-label="Page navigation">
+        <ul class="pagination">
+            <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                <a class="page-link" asp-action="Index" asp-route-currentPage="@(currentPage - 1)" asp-route-pageSize="@pageSize" asp-route-searchString="@currentFilter" asp-route-roleFilter="@roleFilter">Previous</a>
+            </li>
+            @for (int i = 1; i <= totalPages; i++)
+            {
+                <li class="page-item @(i == currentPage ? "active" : "")">
+                    <a class="page-link" asp-action="Index" asp-route-currentPage="@i" asp-route-pageSize="@pageSize" asp-route-searchString="@currentFilter" asp-route-roleFilter="@roleFilter">@i</a>
+                </li>
+            }
+            <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                <a class="page-link" asp-action="Index" asp-route-currentPage="@(currentPage + 1)" asp-route-pageSize="@pageSize" asp-route-searchString="@currentFilter" asp-route-roleFilter="@roleFilter">Next</a>
+            </li>
+        </ul>
+    </nav>
 }
 else
 {
@@ -71,11 +75,12 @@ else
         <div class="card-header">
             No users created yet
         </div>
-        <div class="card-body d-flex align-items-center">
+        <div class="card-body">
             <h5 class="card-title">
                 Use the button below to create a user
             </h5>
-            <a class="ms-2 btn btn-success" asp-area="Identity" asp-controller="Account" asp-action="Register">
+            <a class="btn btn-primary" style="width:auto"
+               asp-area="Identity" asp-controller="Account" asp-action="Register">
                 Add new user
             </a>
         </div>
