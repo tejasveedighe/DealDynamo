@@ -542,5 +542,21 @@ namespace DealDynamo.Controllers
 
             return RedirectToAction(nameof(Details), new { id = orderItem.OrderId });
         }
+        [HttpPost]
+        public IActionResult UpdateShippingDate(int orderId, DateTime shippingDate)
+        {
+            var order = _orderRepository.GetOrderById(orderId);
+
+            if (order == null)
+            {
+                return NotFound();
+            }
+
+            order.ShippingDate = shippingDate;
+            _orderRepository.UpdateOrder(order);
+
+            return RedirectToAction("Details", new { id = orderId });
+        }
+
     }
 }

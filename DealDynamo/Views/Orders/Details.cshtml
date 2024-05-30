@@ -84,6 +84,22 @@
                     <p>No Payment Details.</p>
                 }
             </div>
+            @if(User.IsInRole("Seller") && Model.OrderStatus != OrderStatusEnum.Complete && Model.OrderStatus != OrderStatusEnum.Cancelled)
+            {
+                <br />
+                <div class="rounded border p-2">
+                    <form method="post" asp-action="UpdateShippingDate" asp-controller="Orders">
+                        <div class="form-group">
+                            <label asp-for="ShippingDate" class="control-label"></label>
+                            <input asp-for="ShippingDate" class="form-control" id="datePicker" />
+                        </div>
+                        <div class="mt-4">
+                            <input type="hidden" name="orderId" value="@Model.Id" />
+                            <button type="submit" class="btn btn-warning">Update Shipping Date</button>
+                        </div>
+                    </form>
+                </div>
+            }
             <div class="mt-4">
                 <a class="btn btn-primary" asp-action="Index">Back to List</a>
             </div>
@@ -105,9 +121,8 @@
                                     <li>Price: $@item?.Product?.Price</li>
                                     <li>Sub-Total Price: $@(item?.Product?.Price * item.Quantity)</li>
                                     <li>Status: 
-                                        @if(User.IsInRole("Seller") && item.Status != OrderItemStatus.Delivered)
+                                        @if(User.IsInRole("Seller") && item.Status != OrderItemStatus.Delivered && item.Status != OrderItemStatus.Cancelled)
                                         {
-                                            
                                         <form method="post" asp-action="UpdateStatus" asp-controller="Orders">
                                             <select class="form-select" name="status" onchange="this.form.submit()">
                                                 @foreach (OrderItemStatus status in Enum.GetValues(typeof(OrderItemStatus)))

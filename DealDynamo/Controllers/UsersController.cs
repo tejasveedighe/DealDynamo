@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace DealDynamo.Controllers
 {
@@ -18,11 +19,36 @@ namespace DealDynamo.Controllers
             UserManager = userManager;
         }
         // GET: UsersController
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchString, string roleFilter)
         {
             string currentUserId = UserManager.GetUserId(User);
-            var users = UserManager.Users.Where(x => x.Id != currentUserId).ToList();
-            return View(users);
+            var users = UserManager.Users.Where(x => x.Id != currentUserId);
+
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                users = users.Where(u => u.UserName.Contains(searchString));
+            }
+
+            if (!string.IsNullOrEmpty(roleFilter))
+            {
+                switch (roleFilter)
+                {
+                    case "Admin":
+                        users = users.Where(u => u.IsAdmin);
+                        break;
+                    case "Seller":
+                        users = users.Where(u => u.IsSeller);
+                        break;
+                    case "Buyer":
+                        users = users.Where(u => u.IsBuyer);
+                        break;
+                }
+            }
+
+            ViewData["CurrentFilter"] = searchString;
+            ViewData["RoleFilter"] = roleFilter;
+
+            return View(users.ToList());
         }
 
         // GET: UsersController/Details/5

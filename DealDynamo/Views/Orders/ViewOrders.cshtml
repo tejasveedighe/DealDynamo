@@ -50,7 +50,9 @@
                     <td>@order.OrderDate?.ToString("dd-MM-yyyy")</td>
                     <td>@if (order.ShippingDate != null)
                         {
-                            order.ShippingDate?.ToString("dd-MM-yyyy");
+                            <text>
+                                @order.ShippingDate
+                            </text>
                         } else
                         {
                             <text>Will be Updated Soon.</text>

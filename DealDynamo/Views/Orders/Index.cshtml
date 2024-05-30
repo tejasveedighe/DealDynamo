@@ -56,10 +56,6 @@
                 <td data-order-date="@order.OrderDate?.ToString("yyyy-MM-dd")">@order.OrderDate?.ToString("dd-MM-yyyy")</td>
                 <td>@order?.Payment?.Status</td>
                 <td>
-                    @if(User.IsInRole("Seller"))
-                    {
-                        <a href="@Url.Action("Edit", "Orders", new { id = order.Id })" class="btn btn-warning">Edit</a>
-                    }
                     <a href="@Url.Action("Details", "Orders", new { id = order.Id })" class="btn btn-info">View</a>
                 </td>
             </tr>
