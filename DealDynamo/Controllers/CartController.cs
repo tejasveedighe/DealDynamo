@@ -92,7 +92,14 @@ namespace DealDynamo.Controllers
                 }
                 else
                 {
-                    return Problem("Quantity cannot be more than stock");
+                    var vm = new CartViewModel
+                    {
+                        CartItems = cart,
+                        TotalPrice = cart.Sum(x => x.Product.Price * x.Quantity)
+                    };
+
+                    ViewBag.Error = "The item cannot be added as it is not currently available in stock";
+                    return View("ViewCart", vm);
                 }
             }
             else
