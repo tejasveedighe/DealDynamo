@@ -72,7 +72,13 @@
 
     <div class="position-sticky top-0 d-flex align-items-start justify-content-center flex-column gap-2 mt-5">
         <a asp-action="Index" asp-controller="Home" class="btn btn-primary">Continue Shopping</a>
-        @if (Model.CartItems.Any())
+        @if(Model.TotalPrice > 30000)
+        {
+            <div class="alert alert-danger" role="alert">
+                Cannot have a cart with more than $30,000.
+            </div>
+        }
+        else if (Model.CartItems.Any())
         {
             <a asp-controller="Orders" asp-action="Checkout" class="btn btn-success">Place Order</a>
         }

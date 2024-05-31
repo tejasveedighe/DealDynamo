@@ -146,7 +146,7 @@ namespace DealDynamo.Controllers
                     {
                         PriceData = new SessionLineItemPriceDataOptions()
                         {
-                            UnitAmount = (long)(item.Product.Price * item.Quantity * 10),
+                            UnitAmount = (long)(item.Product.Price * item.Quantity) * 10,
                             Currency = "USD",
                             ProductData = new SessionLineItemPriceDataProductDataOptions()
                             {
