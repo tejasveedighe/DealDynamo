@@ -3,6 +3,9 @@
 
 @{
     ViewData["Title"] = "Order Details";
+
+    var allItemsCancelled = Model.OrderItems.All(oi => oi.Status == OrderItemStatus.Cancelled);
+    var allItemsDelivered = Model.OrderItems.All(oi => oi.Status == OrderItemStatus.Delivered);
 }
 
 
@@ -84,7 +87,7 @@
                     <p>No Payment Details.</p>
                 }
             </div>
-            @if(User.IsInRole("Seller") && Model.OrderStatus != OrderStatusEnum.Complete && Model.OrderStatus != OrderStatusEnum.Cancelled)
+            @if(User.IsInRole("Seller") && Model.OrderStatus != OrderStatusEnum.Complete && Model.OrderStatus != OrderStatusEnum.Cancelled && !allItemsCancelled && !allItemsDelivered)
             {
                 <br />
                 <div class="rounded border p-2">

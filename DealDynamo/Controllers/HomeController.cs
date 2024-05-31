@@ -90,7 +90,6 @@ namespace DealDynamo.Controllers
             List<MonthlySalesData> monthlySales = new List<MonthlySalesData>();
             if (User.IsInRole("Admin"))
             {
-
                 monthlySales = _paymentsRepository.GetAllPayments()
                 .Where(p => p.PaymentDate != null)
                 .GroupBy(p => new { Year = p.PaymentDate.Value.Year, Month = p.PaymentDate.Value.Month })
