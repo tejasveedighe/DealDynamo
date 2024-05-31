@@ -17,13 +17,27 @@
                     @Html.DisplayNameFor(model => model.Amount)
                 </dt>
                 <dd class = "col-sm-10">
-                    @Html.DisplayFor(model => model.Amount)
+                    $@Html.DisplayFor(model => model.Amount)
                 </dd>
                 <dt class = "col-sm-2">
                     @Html.DisplayNameFor(model => model.Status)
                 </dt>
                 <dd class = "col-sm-10">
-                    @Html.DisplayFor(model => model.Status)
+                    @switch(Model.Status)
+                    {
+                        case DealDynamo.Models.Enums.PaymentStatusEnum.Pending:
+                            <span class="badge text-bg-warning">@Model.Status</span>
+                            break;
+                        case DealDynamo.Models.Enums.PaymentStatusEnum.Failed:
+                            <span class="badge text-bg-danger">@Model.Status</span>
+                            break;
+                        case DealDynamo.Models.Enums.PaymentStatusEnum.Refunded:
+                            <span class="badge text-bg-info">@Model.Status</span>
+                            break;
+                        case DealDynamo.Models.Enums.PaymentStatusEnum.Complete:
+                            <span class="badge text-bg-success">@Model.Status</span>
+                            break;
+                    }
                 </dd>
                 <dt class = "col-sm-2">
                     @Html.DisplayNameFor(model => model.PaymentDate)
