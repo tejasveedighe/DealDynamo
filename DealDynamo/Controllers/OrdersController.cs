@@ -96,6 +96,20 @@ namespace DealDynamo.Controllers
             return View(order);
         }
 
+        [Authorize(Roles = "Admin, Seller")]
+        public PartialViewResult GetOrderDetails(int id)
+        {
+            var order = _orderRepository.GetOrderById(id);
+            var userId = _userManager.GetUserId(User);
+
+            if (User.IsInRole("Seller"))
+            {
+                order.OrderItems = order.OrderItems.Where(order => order.SellerId == userId).ToList();
+            }
+            return PartialView("_OrderDetails", order);
+        }
+
+
         [Authorize(Roles = "Buyer")]
         public async Task<IActionResult> Checkout()
         {

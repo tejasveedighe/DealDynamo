@@ -34,8 +34,8 @@
                 <dt class = "col-sm-2">
                     @Html.DisplayNameFor(model => model.Order)
                 </dt>
-                <dd class = "col-sm-10">
-                    <a asp-controller="Orders" asp-action="Details" asp-route-id="@Model.Order?.Id">View Order</a>
+                <dd class="col-sm-10">
+                    <a href="#" class="view-order-link" data-order-id="@Model.Order?.Id">View Order</a>
                 </dd>
             </dl>
         </div>
@@ -44,3 +44,40 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="orderDetailsModal" tabindex="-1" role="dialog" aria-labelledby="orderDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="orderDetailsModalLabel">Order Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                </button>
+            </div>
+            <div class="modal-body">
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(function () {
+            $('.view-order-link').on('click', function (e) {
+                e.preventDefault();
+                var orderId = $(this).data('order-id');
+                $.ajax({
+                    url: '@Url.Action("GetOrderDetails", "Orders")',
+                    type: 'GET',
+                    data: { id: orderId },
+                    success: function (data) {
+                        $('#orderDetailsModal .modal-body').html(data);
+                        $('#orderDetailsModal').modal('show');
+                    },
+                    error: function () {
+                        alert('Error loading order details.');
+                    }
+                });
+            });
+        });
+    </script>
+}
