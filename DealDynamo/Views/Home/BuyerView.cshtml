@@ -42,7 +42,13 @@
                 </span>
                 <hr>
                 <a asp-controller="Home" asp-action="Details" asp-route-id="@item.Id">View Details</a>
-                <a class="text-warning float-right" asp-controller="Cart" asp-action="AddToCart" asp-route-id="@item.Id">Add To Cart</a>
+                    @if(item.Quantity > 0)
+                    {
+                        <a class="text-warning float-right" asp-controller="Cart" asp-action="AddToCart" asp-route-id="@item.Id">Add To Cart</a>
+                    } else
+                    {
+                        <span class="badge text-bg-danger">Out of Stock</span>
+                    }
             </div>
         </div>
     }

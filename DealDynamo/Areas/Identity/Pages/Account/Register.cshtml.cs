@@ -127,6 +127,13 @@ namespace DealDynamo.Areas.Identity.Pages.Account
                 user.IsSeller = Input.IsSeller;
                 user.IsBuyer = Input.IsBuyer;
 
+                    if (returnUrl.Contains("orders/checkout", StringComparison.OrdinalIgnoreCase) && user.IsSeller)
+                    {
+                        ModelState.AddModelError(string.Empty, "Sellers cannot access checkout. Please login as a buyer.");
+                        await _signInManager.SignOutAsync(); // Sign out the user
+                        return Page();
+                    }
+
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
                 var result = await _userManager.CreateAsync(user, Input.Password);
@@ -157,6 +164,7 @@ namespace DealDynamo.Areas.Identity.Pages.Account
                     else
                     {
                         await _signInManager.SignInAsync(user, isPersistent: false);
+
                         return LocalRedirect(returnUrl);
                     }
                 }
