@@ -483,11 +483,16 @@ namespace DealDynamo.Controllers
 
             var order = _orderRepository.GetOrderById(orderItem.OrderId);
 
-            if (order.OrderItems.Where(oi => oi.Status != OrderItemStatus.Cancelled).Count() == 0)
+
+            if (order.OrderItems.All(oi => oi.Status == OrderItemStatus.Cancelled))
             {
                 order.OrderStatus = OrderStatusEnum.Cancelled;
-            }
 
+                if (order.Payment != null)
+                {
+                    order.Payment.Status = PaymentStatusEnum.Refunded;
+                }
+            }
             if (order.Payment != null)
             {
                 order.Payment.Amount -= orderItem.Quantity * orderItem.PricePerUnit;
