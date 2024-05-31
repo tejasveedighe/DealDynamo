@@ -540,7 +540,7 @@ namespace DealDynamo.Controllers
                 EmailBody = $"Dear {order.Buyer.UserName}, the status of Order Id: ${order.Id} item has been updated. Please check the site for more details."
             });
 
-            return RedirectToAction(nameof(Details), new { id = orderItem.OrderId });
+            return Json(new { success = true });
         }
         [HttpPost]
         public IActionResult UpdateShippingDate(int orderId, DateTime shippingDate)
@@ -552,10 +552,16 @@ namespace DealDynamo.Controllers
                 return NotFound();
             }
 
+            if(shippingDate <= order.OrderDate || shippingDate < DateTime.Today)
+            {
+                ModelState.AddModelError("Shipping Date", "The shipping date cannot be before order date and today.");
+                return View(nameof(Details), new {id = orderId});
+            }
+
             order.ShippingDate = shippingDate;
             _orderRepository.UpdateOrder(order);
 
-            return RedirectToAction("Details", new { id = orderId });
+            return Json(new { success = true });
         }
 
     }

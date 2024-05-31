@@ -88,10 +88,10 @@
             {
                 <br />
                 <div class="rounded border p-2">
-                    <form method="post" asp-action="UpdateShippingDate" asp-controller="Orders">
+                    <form id="shippingDateForm" onsubmit="return validateDate()" method="post" asp-action="UpdateShippingDate" asp-controller="Orders">
                         <div class="form-group">
                             <label asp-for="ShippingDate" class="control-label"></label>
-                            <input asp-for="ShippingDate" class="form-control" id="datePicker" />
+                            <input id="datePicker" asp-for="ShippingDate" class="form-control" id="datePicker" />
                         </div>
                         <div class="mt-4">
                             <input type="hidden" name="orderId" value="@Model.Id" />
@@ -123,8 +123,8 @@
                                     <li>Status: 
                                         @if(User.IsInRole("Seller") && item.Status != OrderItemStatus.Delivered && item.Status != OrderItemStatus.Cancelled)
                                         {
-                                        <form method="post" asp-action="UpdateStatus" asp-controller="Orders">
-                                            <select class="form-select" name="status" onchange="this.form.submit()">
+                                        <form id="orderItemStatus" method="post" asp-action="UpdateStatus" asp-controller="Orders" onsubmit="return false;">
+                                            <select class="form-select" name="status" onchange="submitOrderItemStatusForm(this)">
                                                 @foreach (OrderItemStatus status in Enum.GetValues(typeof(OrderItemStatus)))
                                                 {
                                                     if(status == OrderItemStatus.Cancelled) { continue; }
@@ -132,7 +132,7 @@
                                                 }
                                             </select>
                                             <input type="hidden" name="orderItemId" value="@item.Id" />
-                                            </form>
+                                        </form>
                                         } else
                                         {
                                             <text>@item.Status</text>
@@ -148,3 +148,71 @@
     </div>
 </div>
 
+@section Scripts {
+    <script>
+        function validateDate() {
+            const orderDate = new Date('@Model.OrderDate');
+            const today = new Date();
+            today.setHours(0, 0, 0, 0); // Ignore time part
+            const shippingDate = new Date(document.getElementById('datePicker').value);
+
+            if (shippingDate <= orderDate || shippingDate < today) {
+                swal.fire({
+                            text: "The shipping date must be after the order date and today.",
+                            title: "error",
+                            icon: "error"
+                        });
+
+                return false; // Prevent form submission
+            }
+            return true; // Allow form submission
+        }
+        $('#shippingDateForm').on('submit', function (event) {
+            event.preventDefault();
+            if (validateDate()) {
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("UpdateShippingDate", "Orders")',
+                    data: $(this).serialize(),
+                    success: function (response) {
+                        swal.fire({
+                            text: "Shipping date updated successfully!",
+                            title: "success",
+                            icon: "success"
+                        });
+                    },
+                    error: function (response) {
+                        swal.fire({
+                            text: "There was an error updating the shipping date.",
+                            title: "error",
+                            icon: "error"
+                        });
+                    }
+                });
+            }
+        });
+
+        window.submitOrderItemStatusForm = function (selectElement) {
+            const form = $(selectElement).closest('form');
+            $.ajax({
+                type: 'POST',
+                url: form.attr('action'),
+                data: form.serialize(),
+                success: function (response) {
+                    swal.fire({
+                        text: "Item Status Updated",
+                        title: "Success",
+                        icon: "success"
+                    });
+                },
+                error: function (response) {
+                    swal.fire({
+                        text: "There was an error updating the item status.",
+                        title: "Error",
+                        icon: "error"
+                    });
+                }
+            });
+        }
+    </script>
+}
