@@ -33,7 +33,7 @@ namespace DealDynamo.Controllers
         [Authorize(Roles = "Admin, Seller")]
         // GET: PaymentsController
         [HttpGet]
-        public async Task<IActionResult> Index(int currentPage = 1, int pageSize = 10, string paymentStatusFilter = "", string sortPaymentDate = "")
+        public async Task<IActionResult> Index(int currentPage = 1, int pageSize = 10, string paymentStatusFilter = "", string dateFilter = "", string sortPaymentDate = "")
         {
             var user = await _userManager.GetUserAsync(User);
 
@@ -52,6 +52,12 @@ namespace DealDynamo.Controllers
             if (!string.IsNullOrEmpty(paymentStatusFilter) && !string.Equals(paymentStatusFilter, "All"))
             {
                 payments = payments.Where(p => p.Status.ToString().Equals(paymentStatusFilter, StringComparison.OrdinalIgnoreCase));
+            }
+
+            // Apply date filter if specified
+            if (DateTime.TryParse(dateFilter, out DateTime parsedDate))
+            {
+                payments = payments.Where(p => p.PaymentDate.HasValue && p.PaymentDate.Value.Date == parsedDate.Date);
             }
 
             // Sort payments by payment date if specified
@@ -80,6 +86,7 @@ namespace DealDynamo.Controllers
             };
 
             ViewBag.PaymentStatusFilter = paymentStatusFilter;
+            ViewBag.DateFilter = dateFilter;
             ViewBag.SortPaymentDate = sortPaymentDate;
 
             return View(vm);
