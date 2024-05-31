@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Drawing.Printing;
+using System.Linq;
 
 namespace DealDynamo.Controllers
 {
@@ -31,9 +32,10 @@ namespace DealDynamo.Controllers
         }
         // GET: ProductController
         [HttpGet]
-        public async Task<ActionResult> Index(int currentPage = 1, int pageSize = 4, int? categoryFilter = null, string sortOrder = "title_asc")
+        public async Task<ActionResult> Index(int currentPage = 1, int pageSize = 4, int? categoryFilter = null, string sortOrder = "title_asc", string sellerFilter = "")
         {
             IEnumerable<Product> products = _productRepository.GetAllProducts();
+            var sellers = UserManager.Users.Where(x => x.IsSeller).ToDictionary(x => x.Id, x => x.UserName);
 
             if (await UserManager.IsInRoleAsync(await UserManager.GetUserAsync(User), "Seller"))
             {
@@ -71,6 +73,11 @@ namespace DealDynamo.Controllers
                     break;
             }
 
+            if (!string.IsNullOrEmpty(sellerFilter))
+            {
+                products = products.Where(x => x.SellerID == Guid.Parse(sellerFilter));
+            }
+
             int totalProducts = products.Count();
             int totalPages = (int)Math.Ceiling(totalProducts / (double)pageSize);
 
@@ -84,11 +91,13 @@ namespace DealDynamo.Controllers
                 Products = paginatedProducts,
                 CurrentPage = currentPage,
                 TotalPages = totalPages,
-                PageSize = pageSize
+                PageSize = pageSize,
+                Sellers = sellers
             };
 
             ViewBag.CategoryFilter = categoryFilter;
             ViewBag.SortOrder = sortOrder;
+            ViewBag.SellerFilter = sellerFilter;
 
             return View(viewModel);
         }
@@ -208,7 +217,7 @@ namespace DealDynamo.Controllers
 
                 TempData["UpdateSuccess"] = true;
 
-                return RedirectToAction(nameof(Edit), new {id = vm.ProductId});
+                return RedirectToAction(nameof(Edit), new { id = vm.ProductId });
             }
             catch
             {
@@ -217,7 +226,7 @@ namespace DealDynamo.Controllers
         }
 
         // GET: ProductController/Delete/5
-        [Authorize(Roles = "Seller")]
+        [Authorize(Roles = "Seller, Admin")]
         public ActionResult Delete(int id)
         {
             Product product = _productRepository.GetProductById(id);

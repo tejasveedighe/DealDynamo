@@ -557,10 +557,10 @@ namespace DealDynamo.Controllers
                 return NotFound();
             }
 
-            if(shippingDate <= order.OrderDate || shippingDate < DateTime.Today)
+            if (shippingDate <= order.OrderDate || shippingDate < DateTime.Today)
             {
                 ModelState.AddModelError("Shipping Date", "The shipping date cannot be before order date and today.");
-                return View(nameof(Details), new {id = orderId});
+                return View(nameof(Details), new { id = orderId });
             }
 
             order.ShippingDate = shippingDate;
